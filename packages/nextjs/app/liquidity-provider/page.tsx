@@ -9,31 +9,33 @@ import { PredictionMarketInfo } from "~~/components/user/PredictionMarketInfo";
 import { useDeployedContractInfo, useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
 const LiquidityProvider: NextPage = () => {
-  const { data: deployedContract, isLoading: isDeployedContractLoading } = useDeployedContractInfo({
-    contractName: "PredictionMarket",
+  const { data: factory, isLoading: isFactoryLoading } = useDeployedContractInfo({
+    contractName: "PolyBetFactory",
   });
 
-  const { data: owner, isLoading: isOwnerLoading } = useScaffoldReadContract({
-    contractName: "PredictionMarket",
-    functionName: "owner",
+  const { data: registry, isLoading: isRegistryLoading } = useDeployedContractInfo({
+    contractName: "PolyBetRegistry",
   });
 
-  if (isDeployedContractLoading || isOwnerLoading) {
+  const { data: markets, isLoading: isMarketsLoading } = useScaffoldReadContract({
+    contractName: "PolyBetRegistry",
+    functionName: "getAllMarkets",
+  });
+
+  if (isFactoryLoading || isRegistryLoading || isMarketsLoading) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
         <div className="loading loading-spinner loading-lg"></div>
-        <div className="text-lg">
-          {isDeployedContractLoading ? "Checking contract deployment..." : "Loading contract data..."}
-        </div>
+        <div className="text-lg">Loading prediction markets...</div>
       </div>
     );
   }
 
-  if (!deployedContract || owner === undefined) {
+  if (!factory || !registry || !markets || markets.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <div className="alert alert-warning max-w-md center flex justify-center">
-          <span>🔮 No prediction market deployed!</span>
+          <span>🔮 No prediction markets available!</span>
         </div>
       </div>
     );

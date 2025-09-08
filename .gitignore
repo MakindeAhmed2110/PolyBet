@@ -22,3 +22,4 @@ node_modules
 # cli
 dist
 guide.md
+todo.md

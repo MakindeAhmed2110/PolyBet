@@ -6,24 +6,134 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
   31337: {
-    PredictionMarket: {
-      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707",
+    PolyBetFactory: {
+      address: "0x09635F643e140090A9A8Dcd712eD6285858ceBef",
       abi: [
         {
           inputs: [
-            {
-              internalType: "address",
-              name: "_liquidityProvider",
-              type: "address",
-            },
             {
               internalType: "address",
               name: "_oracle",
               type: "address",
             },
             {
+              internalType: "address",
+              name: "_registry",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "PolyBetFactory__InvalidCategory",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBetFactory__InvalidExpirationTime",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBetFactory__InvalidInitialLiquidity",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBetFactory__InvalidPercentageToLock",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBetFactory__InvalidProbability",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBetFactory__InvalidQuestion",
+          type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: false,
+              internalType: "string",
+              name: "category",
+              type: "string",
+            },
+          ],
+          name: "CategoryAdded",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "marketAddress",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "creator",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "question",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "category",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "initialLiquidity",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "creationTimestamp",
+              type: "uint256",
+            },
+          ],
+          name: "MarketCreated",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_category",
+              type: "string",
+            },
+          ],
+          name: "addCategory",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
               internalType: "string",
               name: "_question",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_category",
               type: "string",
             },
             {
@@ -41,384 +151,39 @@ const deployedContracts = {
               name: "_percentageToLock",
               type: "uint8",
             },
+            {
+              internalType: "uint256",
+              name: "_expirationTime",
+              type: "uint256",
+            },
           ],
-          stateMutability: "payable",
-          type: "constructor",
-        },
-        {
-          inputs: [
+          name: "createMarket",
+          outputs: [
             {
               internalType: "address",
-              name: "owner",
+              name: "marketAddress",
               type: "address",
             },
           ],
-          name: "OwnableInvalidOwner",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "OwnableUnauthorizedAccount",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__AmountMustBeGreaterThanZero",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__ETHTransferFailed",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_allowance",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_userBalance",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InsufficientLiquidity",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_amountToken",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientTokenReserve",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InsufficientWinningTokens",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InvalidPercentageToLock",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InvalidProbability",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__MustProvideETHForInitialLiquidity",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__MustSendExactETHAmount",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__OnlyOracleCanReport",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__OwnerCannotCall",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__PredictionAlreadyReported",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__PredictionNotReported",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__TokenTransferFailed",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "provider",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "tokensAmount",
-              type: "uint256",
-            },
-          ],
-          name: "LiquidityAdded",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "provider",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "tokensAmount",
-              type: "uint256",
-            },
-          ],
-          name: "LiquidityRemoved",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "oracle",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "winningOutcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "address",
-              name: "winningToken",
-              type: "address",
-            },
-          ],
-          name: "MarketReported",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "resolver",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "totalEthToSend",
-              type: "uint256",
-            },
-          ],
-          name: "MarketResolved",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "previousOwner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "OwnershipTransferred",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "buyer",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "outcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "TokensPurchased",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "seller",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "outcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "TokensSold",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "redeemer",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "WinningTokensRedeemed",
-          type: "event",
-        },
-        {
-          inputs: [],
-          name: "addLiquidity",
-          outputs: [],
           stateMutability: "payable",
           type: "function",
         },
         {
-          inputs: [
+          inputs: [],
+          name: "getCategories",
+          outputs: [
             {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_amountTokenToBuy",
-              type: "uint256",
+              internalType: "string[]",
+              name: "",
+              type: "string[]",
             },
           ],
-          name: "buyTokensWithETH",
-          outputs: [],
-          stateMutability: "payable",
+          stateMutability: "view",
           type: "function",
         },
         {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-          ],
-          name: "getBuyPriceInEth",
+          inputs: [],
+          name: "getCategoryCount",
           outputs: [
             {
               internalType: "uint256",
@@ -431,111 +196,27 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "getPrediction",
+          name: "getFactoryInfo",
           outputs: [
-            {
-              internalType: "string",
-              name: "question",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "outcome1",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "outcome2",
-              type: "string",
-            },
             {
               internalType: "address",
               name: "oracle",
               type: "address",
             },
             {
-              internalType: "uint256",
-              name: "initialTokenValue",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "yesTokenReserve",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "noTokenReserve",
-              type: "uint256",
-            },
-            {
-              internalType: "bool",
-              name: "isReported",
-              type: "bool",
-            },
-            {
               internalType: "address",
-              name: "yesToken",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "noToken",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "winningToken",
+              name: "registry",
               type: "address",
             },
             {
               internalType: "uint256",
-              name: "ethCollateral",
+              name: "marketCount",
               type: "uint256",
             },
             {
-              internalType: "uint256",
-              name: "lpTradingRevenue",
-              type: "uint256",
-            },
-            {
-              internalType: "address",
-              name: "predictionMarketOwner",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialProbability",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "percentageLocked",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-          ],
-          name: "getSellPriceInEth",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
+              internalType: "string[]",
+              name: "categories",
+              type: "string[]",
             },
           ],
           stateMutability: "view",
@@ -543,38 +224,12 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "i_initialTokenValue",
+          name: "getMarketCount",
           outputs: [
             {
               internalType: "uint256",
               name: "",
               type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_initialYesProbability",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_noToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
             },
           ],
           stateMutability: "view",
@@ -595,33 +250,7 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "i_percentageLocked",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_yesToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "owner",
+          name: "i_registry",
           outputs: [
             {
               internalType: "address",
@@ -636,103 +265,11 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "uint256",
-              name: "_amount",
-              type: "uint256",
-            },
-          ],
-          name: "redeemWinningTokens",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_ethToWithdraw",
-              type: "uint256",
-            },
-          ],
-          name: "removeLiquidity",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "renounceOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_winningOutcome",
-              type: "uint8",
-            },
-          ],
-          name: "report",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "resolveMarketAndWithdraw",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "ethRedeemed",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_ethCollateral",
-          outputs: [
-            {
-              internalType: "uint256",
               name: "",
               type: "uint256",
             },
           ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_isReported",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_lpTradingRevenue",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_question",
+          name: "s_categories",
           outputs: [
             {
               internalType: "string",
@@ -745,249 +282,7 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "s_winningToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-          ],
-          name: "sellTokensForEth",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "transferOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ],
-      inheritedFunctions: {
-        owner: "@openzeppelin/contracts/access/Ownable.sol",
-        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-      },
-    },
-    PredictionMarketTokenNo: {
-      address: "0x23dB4a08f2272df049a4932a4Cc3A6Dc1002B33E",
-      abi: [
-        {
-          inputs: [
-            {
-              internalType: "string",
-              name: "name",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "symbol",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "_liquidityProvider",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialSupply",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "allowance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "balance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "approver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidApprover",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "receiver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidReceiver",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSender",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSpender",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__LiquidityProviderCantTransfer",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanBurn",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanMint",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Approval",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Transfer",
-          type: "event",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "allowance",
+          name: "s_marketCount",
           outputs: [
             {
               internalType: "uint256",
@@ -996,349 +291,38 @@ const deployedContracts = {
             },
           ],
           stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "approve",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "balanceOf",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "burn",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "decimals",
-          outputs: [
-            {
-              internalType: "uint8",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "liquidityProvider",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "mint",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "name",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "predictionMarket",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "symbol",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalSupply",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transfer",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transferFrom",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
           type: "function",
         },
       ],
       inheritedFunctions: {},
     },
-    PredictionMarketTokenYes: {
-      address: "0x61c36a8d610163660E21a8b7359e1Cac0C9133e1",
+    PolyBetRegistry: {
+      address: "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F",
       abi: [
         {
           inputs: [
             {
-              internalType: "string",
-              name: "name",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "symbol",
-              type: "string",
-            },
-            {
               internalType: "address",
-              name: "_liquidityProvider",
+              name: "_factory",
               type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialSupply",
-              type: "uint256",
             },
           ],
           stateMutability: "nonpayable",
           type: "constructor",
         },
         {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "allowance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "balance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "approver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidApprover",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "receiver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidReceiver",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSender",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSpender",
+          inputs: [],
+          name: "PolyBetRegistry__MarketAlreadyRegistered",
           type: "error",
         },
         {
           inputs: [],
-          name: "PredictionMarketToken__LiquidityProviderCantTransfer",
+          name: "PolyBetRegistry__MarketNotRegistered",
           type: "error",
         },
         {
           inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanBurn",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanMint",
+          name: "PolyBetRegistry__UnauthorizedAccess",
           type: "error",
         },
         {
@@ -1347,23 +331,11 @@ const deployedContracts = {
             {
               indexed: true,
               internalType: "address",
-              name: "owner",
+              name: "factory",
               type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
             },
           ],
-          name: "Approval",
+          name: "FactorySet",
           type: "event",
         },
         {
@@ -1372,87 +344,64 @@ const deployedContracts = {
             {
               indexed: true,
               internalType: "address",
-              name: "from",
+              name: "marketAddress",
               type: "address",
             },
             {
               indexed: true,
               internalType: "address",
-              name: "to",
+              name: "creator",
               type: "address",
             },
             {
               indexed: false,
+              internalType: "string",
+              name: "question",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "category",
+              type: "string",
+            },
+            {
+              indexed: false,
               internalType: "uint256",
-              name: "value",
+              name: "createdAt",
               type: "uint256",
             },
           ],
-          name: "Transfer",
+          name: "MarketRegistered",
           type: "event",
         },
         {
+          anonymous: false,
           inputs: [
             {
+              indexed: true,
               internalType: "address",
-              name: "owner",
+              name: "marketAddress",
               type: "address",
             },
             {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "allowance",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "approve",
-          outputs: [
-            {
+              indexed: false,
               internalType: "bool",
-              name: "",
+              name: "isActive",
               type: "bool",
             },
           ],
-          stateMutability: "nonpayable",
-          type: "function",
+          name: "MarketStatusUpdated",
+          type: "event",
         },
         {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "balanceOf",
+          inputs: [],
+          name: "getAllMarkets",
           outputs: [
             {
-              internalType: "uint256",
+              internalType: "address[]",
               name: "",
-              type: "uint256",
+              type: "address[]",
             },
           ],
           stateMutability: "view",
@@ -1462,36 +411,215 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "address",
-              name: "from",
+              name: "_marketAddress",
+              type: "address",
+            },
+          ],
+          name: "getMarketInfo",
+          outputs: [
+            {
+              internalType: "address",
+              name: "marketAddress",
               type: "address",
             },
             {
+              internalType: "address",
+              name: "creator",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "question",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "category",
+              type: "string",
+            },
+            {
               internalType: "uint256",
-              name: "amount",
+              name: "createdAt",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "isActive",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_category",
+              type: "string",
+            },
+          ],
+          name: "getMarketsByCategory",
+          outputs: [
+            {
+              internalType: "address[]",
+              name: "",
+              type: "address[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_creator",
+              type: "address",
+            },
+          ],
+          name: "getMarketsByCreator",
+          outputs: [
+            {
+              internalType: "address[]",
+              name: "",
+              type: "address[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_offset",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_limit",
               type: "uint256",
             },
           ],
-          name: "burn",
+          name: "getMarketsPaginated",
+          outputs: [
+            {
+              internalType: "address[]",
+              name: "markets",
+              type: "address[]",
+            },
+            {
+              internalType: "uint256",
+              name: "totalCount",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getRegistryStats",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "totalMarkets",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "activeMarkets",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "factory",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "i_factory",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_marketAddress",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_creator",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "_question",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_category",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "_createdAt",
+              type: "uint256",
+            },
+          ],
+          name: "registerMarket",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
         {
-          inputs: [],
-          name: "decimals",
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "s_allMarkets",
           outputs: [
             {
-              internalType: "uint8",
+              internalType: "address",
               name: "",
-              type: "uint8",
+              type: "address",
             },
           ],
           stateMutability: "view",
           type: "function",
         },
         {
-          inputs: [],
-          name: "liquidityProvider",
+          inputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "s_categoryMarkets",
           outputs: [
             {
               internalType: "address",
@@ -1506,122 +634,111 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "address",
-              name: "to",
+              name: "",
               type: "address",
             },
             {
               internalType: "uint256",
-              name: "amount",
+              name: "",
               type: "uint256",
             },
           ],
-          name: "mint",
+          name: "s_creatorMarkets",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "s_markets",
+          outputs: [
+            {
+              internalType: "address",
+              name: "marketAddress",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "creator",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "question",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "category",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "createdAt",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "isActive",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "s_totalMarkets",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_factory",
+              type: "address",
+            },
+          ],
+          name: "setFactory",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
         {
-          inputs: [],
-          name: "name",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "predictionMarket",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "symbol",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalSupply",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
           inputs: [
             {
               internalType: "address",
-              name: "to",
+              name: "_marketAddress",
               type: "address",
             },
             {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transfer",
-          outputs: [
-            {
               internalType: "bool",
-              name: "",
+              name: "_isActive",
               type: "bool",
             },
           ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transferFrom",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
+          name: "updateMarketStatus",
+          outputs: [],
           stateMutability: "nonpayable",
           type: "function",
         },
@@ -1630,43 +747,12 @@ const deployedContracts = {
     },
   },
   50312: {
-    PredictionMarket: {
-      address: "0xa7B4C051e2F65Ff24d6aE3a8De32774598eabaE5",
+    PolyBetFactory: {
+      address: "0xa59ca7dD500f8C70f4A3F2166D30E03D0f42F460",
       abi: [
         {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_liquidityProvider",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "_oracle",
-              type: "address",
-            },
-            {
-              internalType: "string",
-              name: "_question",
-              type: "string",
-            },
-            {
-              internalType: "uint256",
-              name: "_initialTokenValue",
-              type: "uint256",
-            },
-            {
-              internalType: "uint8",
-              name: "_initialYesProbability",
-              type: "uint8",
-            },
-            {
-              internalType: "uint8",
-              name: "_percentageToLock",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "payable",
+          inputs: [],
+          stateMutability: "nonpayable",
           type: "constructor",
         },
         {
@@ -1693,115 +779,17 @@ const deployedContracts = {
         },
         {
           inputs: [],
-          name: "PredictionMarket__AmountMustBeGreaterThanZero",
+          name: "PolyBetFactory__InvalidParameters",
           type: "error",
         },
         {
           inputs: [],
-          name: "PredictionMarket__ETHTransferFailed",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_allowance",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_userBalance",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientBalance",
+          name: "PolyBetFactory__MarketAlreadyExists",
           type: "error",
         },
         {
           inputs: [],
-          name: "PredictionMarket__InsufficientLiquidity",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_amountToken",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientTokenReserve",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InsufficientWinningTokens",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InvalidPercentageToLock",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InvalidProbability",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__MustProvideETHForInitialLiquidity",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__MustSendExactETHAmount",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__OnlyOracleCanReport",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__OwnerCannotCall",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__PredictionAlreadyReported",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__PredictionNotReported",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__TokenTransferFailed",
+          name: "PolyBetFactory__MarketNotFound",
           type: "error",
         },
         {
@@ -1809,93 +797,36 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
+              internalType: "uint256",
+              name: "marketId",
+              type: "uint256",
+            },
+            {
+              indexed: true,
               internalType: "address",
-              name: "provider",
+              name: "marketAddress",
               type: "address",
             },
             {
               indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
+              internalType: "string",
+              name: "question",
+              type: "string",
             },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "tokensAmount",
-              type: "uint256",
-            },
-          ],
-          name: "LiquidityAdded",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
             {
               indexed: true,
               internalType: "address",
-              name: "provider",
+              name: "creator",
               type: "address",
             },
             {
               indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "tokensAmount",
-              type: "uint256",
-            },
-          ],
-          name: "LiquidityRemoved",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
               internalType: "address",
               name: "oracle",
               type: "address",
             },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "winningOutcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "address",
-              name: "winningToken",
-              type: "address",
-            },
           ],
-          name: "MarketReported",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "resolver",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "totalEthToSend",
-              type: "uint256",
-            },
-          ],
-          name: "MarketResolved",
+          name: "MarketCreated",
           type: "event",
         },
         {
@@ -1918,131 +849,8 @@ const deployedContracts = {
           type: "event",
         },
         {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "buyer",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "outcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "TokensPurchased",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "seller",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "outcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "TokensSold",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "redeemer",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "WinningTokensRedeemed",
-          type: "event",
-        },
-        {
           inputs: [],
-          name: "addLiquidity",
-          outputs: [],
-          stateMutability: "payable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_amountTokenToBuy",
-              type: "uint256",
-            },
-          ],
-          name: "buyTokensWithETH",
-          outputs: [],
-          stateMutability: "payable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-          ],
-          name: "getBuyPriceInEth",
+          name: "MAX_MARKETS",
           outputs: [
             {
               internalType: "uint256",
@@ -2053,1226 +861,17 @@ const deployedContracts = {
           stateMutability: "view",
           type: "function",
         },
-        {
-          inputs: [],
-          name: "getPrediction",
-          outputs: [
-            {
-              internalType: "string",
-              name: "question",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "outcome1",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "outcome2",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "oracle",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialTokenValue",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "yesTokenReserve",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "noTokenReserve",
-              type: "uint256",
-            },
-            {
-              internalType: "bool",
-              name: "isReported",
-              type: "bool",
-            },
-            {
-              internalType: "address",
-              name: "yesToken",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "noToken",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "winningToken",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "ethCollateral",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "lpTradingRevenue",
-              type: "uint256",
-            },
-            {
-              internalType: "address",
-              name: "predictionMarketOwner",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialProbability",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "percentageLocked",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-          ],
-          name: "getSellPriceInEth",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_initialTokenValue",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_initialYesProbability",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_noToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_oracle",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_percentageLocked",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_yesToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "owner",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_amount",
-              type: "uint256",
-            },
-          ],
-          name: "redeemWinningTokens",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_ethToWithdraw",
-              type: "uint256",
-            },
-          ],
-          name: "removeLiquidity",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "renounceOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_winningOutcome",
-              type: "uint8",
-            },
-          ],
-          name: "report",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "resolveMarketAndWithdraw",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "ethRedeemed",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_ethCollateral",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_isReported",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_lpTradingRevenue",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_question",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_winningToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-          ],
-          name: "sellTokensForEth",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "transferOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ],
-      inheritedFunctions: {
-        owner: "@openzeppelin/contracts/access/Ownable.sol",
-        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-      },
-    },
-    PredictionMarketTokenNo: {
-      address: "0x96752294eC6b016C86198B0c8394ea366b30C60f",
-      abi: [
         {
           inputs: [
             {
               internalType: "string",
-              name: "name",
+              name: "_question",
               type: "string",
-            },
-            {
-              internalType: "string",
-              name: "symbol",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "_liquidityProvider",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialSupply",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "allowance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "balance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "approver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidApprover",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "receiver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidReceiver",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSender",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSpender",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__LiquidityProviderCantTransfer",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanBurn",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanMint",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Approval",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Transfer",
-          type: "event",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "allowance",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "approve",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "balanceOf",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "burn",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "decimals",
-          outputs: [
-            {
-              internalType: "uint8",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "liquidityProvider",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "mint",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "name",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "predictionMarket",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "symbol",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalSupply",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transfer",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transferFrom",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ],
-      inheritedFunctions: {},
-    },
-    PredictionMarketTokenYes: {
-      address: "0xAFd5f508646a73fc02C43bd49de6D60CdF40DCDE",
-      abi: [
-        {
-          inputs: [
-            {
-              internalType: "string",
-              name: "name",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "symbol",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "_liquidityProvider",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialSupply",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "allowance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "balance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "approver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidApprover",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "receiver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidReceiver",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSender",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSpender",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__LiquidityProviderCantTransfer",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanBurn",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanMint",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Approval",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Transfer",
-          type: "event",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "allowance",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "approve",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "balanceOf",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "burn",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "decimals",
-          outputs: [
-            {
-              internalType: "uint8",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "liquidityProvider",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "mint",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "name",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "predictionMarket",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "symbol",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalSupply",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transfer",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transferFrom",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ],
-      inheritedFunctions: {},
-    },
-  },
-  11155111: {
-    PredictionMarket: {
-      address: "0x0bb30A924B329B0797a7bec197a476b916cAe173",
-      abi: [
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_liquidityProvider",
-              type: "address",
             },
             {
               internalType: "address",
               name: "_oracle",
               type: "address",
-            },
-            {
-              internalType: "string",
-              name: "_question",
-              type: "string",
             },
             {
               internalType: "uint256",
@@ -3290,383 +889,129 @@ const deployedContracts = {
               type: "uint8",
             },
           ],
-          stateMutability: "payable",
-          type: "constructor",
-        },
-        {
-          inputs: [
+          name: "createMarket",
+          outputs: [
             {
               internalType: "address",
-              name: "owner",
+              name: "marketAddress",
               type: "address",
             },
           ],
-          name: "OwnableInvalidOwner",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "OwnableUnauthorizedAccount",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__AmountMustBeGreaterThanZero",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__ETHTransferFailed",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_allowance",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "_userBalance",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InsufficientLiquidity",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_amountToken",
-              type: "uint256",
-            },
-          ],
-          name: "PredictionMarket__InsufficientTokenReserve",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InsufficientWinningTokens",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InvalidPercentageToLock",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__InvalidProbability",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__MustProvideETHForInitialLiquidity",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__MustSendExactETHAmount",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__OnlyOracleCanReport",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__OwnerCannotCall",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__PredictionAlreadyReported",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__PredictionNotReported",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarket__TokenTransferFailed",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "provider",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "tokensAmount",
-              type: "uint256",
-            },
-          ],
-          name: "LiquidityAdded",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "provider",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "tokensAmount",
-              type: "uint256",
-            },
-          ],
-          name: "LiquidityRemoved",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "oracle",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "winningOutcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "address",
-              name: "winningToken",
-              type: "address",
-            },
-          ],
-          name: "MarketReported",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "resolver",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "totalEthToSend",
-              type: "uint256",
-            },
-          ],
-          name: "MarketResolved",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "previousOwner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "OwnershipTransferred",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "buyer",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "outcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "TokensPurchased",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "seller",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "enum PredictionMarket.Outcome",
-              name: "outcome",
-              type: "uint8",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "TokensSold",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "redeemer",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "ethAmount",
-              type: "uint256",
-            },
-          ],
-          name: "WinningTokensRedeemed",
-          type: "event",
-        },
-        {
-          inputs: [],
-          name: "addLiquidity",
-          outputs: [],
           stateMutability: "payable",
           type: "function",
         },
         {
           inputs: [
             {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
               internalType: "uint256",
-              name: "_amountTokenToBuy",
+              name: "_marketId",
               type: "uint256",
             },
           ],
-          name: "buyTokensWithETH",
+          name: "deactivateMarket",
           outputs: [],
-          stateMutability: "payable",
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getAllMarkets",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "marketAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "question",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "creator",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "oracle",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "createdAt",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "isActive",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct PolyBetFactory.MarketInfo[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
           type: "function",
         },
         {
           inputs: [
             {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
               internalType: "uint256",
-              name: "_tradingAmount",
+              name: "_marketId",
               type: "uint256",
             },
           ],
-          name: "getBuyPriceInEth",
+          name: "getMarket",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "marketAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "question",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "creator",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "oracle",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "createdAt",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "isActive",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct PolyBetFactory.MarketInfo",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMarketCount",
           outputs: [
             {
               internalType: "uint256",
@@ -3678,23 +1023,112 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [],
-          name: "getPrediction",
+          inputs: [
+            {
+              internalType: "address",
+              name: "_creator",
+              type: "address",
+            },
+          ],
+          name: "getMarketsByCreator",
           outputs: [
+            {
+              components: [
+                {
+                  internalType: "address",
+                  name: "marketAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "string",
+                  name: "question",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "creator",
+                  type: "address",
+                },
+                {
+                  internalType: "address",
+                  name: "oracle",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "createdAt",
+                  type: "uint256",
+                },
+                {
+                  internalType: "bool",
+                  name: "isActive",
+                  type: "bool",
+                },
+              ],
+              internalType: "struct PolyBetFactory.MarketInfo[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "isMarket",
+          outputs: [
+            {
+              internalType: "bool",
+              name: "",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "marketCount",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "markets",
+          outputs: [
+            {
+              internalType: "address",
+              name: "marketAddress",
+              type: "address",
+            },
             {
               internalType: "string",
               name: "question",
               type: "string",
             },
             {
-              internalType: "string",
-              name: "outcome1",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "outcome2",
-              type: "string",
+              internalType: "address",
+              name: "creator",
+              type: "address",
             },
             {
               internalType: "address",
@@ -3703,165 +1137,13 @@ const deployedContracts = {
             },
             {
               internalType: "uint256",
-              name: "initialTokenValue",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "yesTokenReserve",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "noTokenReserve",
+              name: "createdAt",
               type: "uint256",
             },
             {
               internalType: "bool",
-              name: "isReported",
+              name: "isActive",
               type: "bool",
-            },
-            {
-              internalType: "address",
-              name: "yesToken",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "noToken",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "winningToken",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "ethCollateral",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "lpTradingRevenue",
-              type: "uint256",
-            },
-            {
-              internalType: "address",
-              name: "predictionMarketOwner",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialProbability",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "percentageLocked",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-          ],
-          name: "getSellPriceInEth",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_initialTokenValue",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_initialYesProbability",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_noToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_oracle",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_percentageLocked",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "i_yesToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
             },
           ],
           stateMutability: "view",
@@ -3881,143 +1163,8 @@ const deployedContracts = {
           type: "function",
         },
         {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_amount",
-              type: "uint256",
-            },
-          ],
-          name: "redeemWinningTokens",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_ethToWithdraw",
-              type: "uint256",
-            },
-          ],
-          name: "removeLiquidity",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
           inputs: [],
           name: "renounceOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_winningOutcome",
-              type: "uint8",
-            },
-          ],
-          name: "report",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "resolveMarketAndWithdraw",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "ethRedeemed",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_ethCollateral",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_isReported",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_lpTradingRevenue",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_question",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "s_winningToken",
-          outputs: [
-            {
-              internalType: "contract PredictionMarketToken",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "enum PredictionMarket.Outcome",
-              name: "_outcome",
-              type: "uint8",
-            },
-            {
-              internalType: "uint256",
-              name: "_tradingAmount",
-              type: "uint256",
-            },
-          ],
-          name: "sellTokensForEth",
           outputs: [],
           stateMutability: "nonpayable",
           type: "function",
@@ -4041,840 +1188,6 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-    },
-    PredictionMarketTokenNo: {
-      address: "0x895Fa090663f7fE93905C1558362a67b7Ba4Dc4A",
-      abi: [
-        {
-          inputs: [
-            {
-              internalType: "string",
-              name: "name",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "symbol",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "_liquidityProvider",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialSupply",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "allowance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "balance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "approver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidApprover",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "receiver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidReceiver",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSender",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSpender",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__LiquidityProviderCantTransfer",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanBurn",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanMint",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Approval",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Transfer",
-          type: "event",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "allowance",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "approve",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "balanceOf",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "burn",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "decimals",
-          outputs: [
-            {
-              internalType: "uint8",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "liquidityProvider",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "mint",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "name",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "predictionMarket",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "symbol",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalSupply",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transfer",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transferFrom",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ],
-      inheritedFunctions: {},
-    },
-    PredictionMarketTokenYes: {
-      address: "0x8746e43c2c72021D6c5D0052523AF3a4ea747EC1",
-      abi: [
-        {
-          inputs: [
-            {
-              internalType: "string",
-              name: "name",
-              type: "string",
-            },
-            {
-              internalType: "string",
-              name: "symbol",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "_liquidityProvider",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "initialSupply",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "allowance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientAllowance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "balance",
-              type: "uint256",
-            },
-            {
-              internalType: "uint256",
-              name: "needed",
-              type: "uint256",
-            },
-          ],
-          name: "ERC20InsufficientBalance",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "approver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidApprover",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "receiver",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidReceiver",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "sender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSender",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "ERC20InvalidSpender",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__LiquidityProviderCantTransfer",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanBurn",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PredictionMarketToken__OnlyPredictionMarketCanMint",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Approval",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "Transfer",
-          type: "event",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-          ],
-          name: "allowance",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "spender",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "value",
-              type: "uint256",
-            },
-          ],
-          name: "approve",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "balanceOf",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "burn",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "decimals",
-          outputs: [
-            {
-              internalType: "uint8",
-              name: "",
-              type: "uint8",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "liquidityProvider",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "mint",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "name",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "predictionMarket",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "symbol",
-          outputs: [
-            {
-              internalType: "string",
-              name: "",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "totalSupply",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transfer",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "from",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "to",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "amount",
-              type: "uint256",
-            },
-          ],
-          name: "transferFrom",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ],
-      inheritedFunctions: {},
     },
   },
 } as const;
