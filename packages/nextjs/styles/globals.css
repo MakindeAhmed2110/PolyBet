@@ -1,5 +1,19 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'PolySans Median';
+  src: url('./fonts/PolySans Median.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'PolySans Neutral';
+  src: url('./fonts/PolySans Neutral.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -182,4 +196,101 @@
 
 @theme inline {
   --font-space-grotesk: var(--font-space-grotesk);
+  --font-poly-sans-median: 'PolySans Median', sans-serif;
+  --font-poly-sans-neutral: 'PolySans Neutral', sans-serif;
+}
+
+/* Custom PolyBet Landing Page Styles */
+.hero-gradient {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0e7ff 25%, #f0fdfa 50%, #fef3c7 75%, #fce7f3 100%);
+}
+
+.glass-effect {
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.floating-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pulse-glow {
+  from {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+  }
+  to {
+    box-shadow: 0 0 30px rgba(59, 130, 246, 0.6);
+  }
+}
+
+/* Glassmorphism Navigation */
+.glassmorphism-nav {
+  backdrop-filter: blur(20px);
+  background: transparent;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Override DaisyUI navbar background */
+.navbar {
+  background: transparent !important;
+}
+
+.navbar.bg-transparent {
+  background: transparent !important;
+}
+
+/* Force transparent background for header */
+div[class*="sticky"][class*="top-0"] {
+  background: transparent !important;
+}
+
+/* Override any DaisyUI theme colors */
+.bg-base-100 {
+  background: transparent !important;
+}
+
+/* Smooth gradient backgrounds */
+.smooth-gradient {
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #f1f5f9 50%, #e0e7ff 75%, #f0f9ff 100%);
+}
+
+/* Enhanced button styles */
+.btn-primary-modern {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-primary-modern:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+}
+
+/* App mockup styling */
+.app-mockup {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.1);
 }
