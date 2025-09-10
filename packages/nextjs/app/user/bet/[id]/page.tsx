@@ -4,8 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import type { NextPage } from "next";
-import { parseEther } from "viem";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 // Mock data for individual bet - in a real app, this would come from your smart contract or API
 const betData: { [key: string]: any } = {
@@ -69,23 +67,13 @@ const BetDetail: NextPage = () => {
   const [selectedOutcome, setSelectedOutcome] = useState<"yes" | "no" | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { writeContractAsync: writePredictionMarketAsync } = useScaffoldWriteContract({
-    contractName: "PredictionMarket",
-  });
-
   const handleBuyTokens = async () => {
     if (!selectedOutcome || !amount) return;
 
     setIsLoading(true);
     try {
       // Convert $SOMI tokens to wei (assuming 18 decimals like ETH)
-      const tokenAmount = parseEther(amount);
 
-      await writePredictionMarketAsync({
-        functionName: "buyTokensWithETH",
-        args: [selectedOutcome === "yes" ? 0 : 1, tokenAmount], // 0 = YES, 1 = NO, amount in wei
-        value: tokenAmount, // This will use $SOMI tokens instead of ETH
-      });
       // Handle success
       console.log("Tokens purchased successfully with $SOMI!");
     } catch (error) {

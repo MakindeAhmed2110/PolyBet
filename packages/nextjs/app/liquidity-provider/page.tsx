@@ -4,8 +4,6 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { NextPage } from "next";
-import { parseEther } from "viem";
-import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 // Mock data for available bets to add liquidity to
 const availableBets = [
@@ -49,21 +47,15 @@ const LiquidityProvider: NextPage = () => {
   const [liquidityAmount, setLiquidityAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const { writeContractAsync: writePredictionMarketAsync } = useScaffoldWriteContract({
-    contractName: "PredictionMarket",
-  });
-
   const handleAddLiquidity = async () => {
     if (!selectedBet || !liquidityAmount) return;
 
     setIsLoading(true);
     try {
-      const tokenAmount = parseEther(liquidityAmount);
-
-      await writePredictionMarketAsync({
-        functionName: "addLiquidity",
-        value: tokenAmount, // addLiquidity() is payable and takes no parameters
-      });
+      // await writePredictionMarketAsync({
+      //   functionName: "updateMarketStatus",
+      //   args: [selectedBet, true],
+      // });
 
       console.log("Liquidity added successfully!");
       // Reset form
