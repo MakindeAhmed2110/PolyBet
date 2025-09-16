@@ -1,14 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { NextPage } from "next";
-import { parseEther } from "viem";
-import { useAccount, useWriteContract } from "wagmi";
+import { formatEther, parseEther } from "viem";
+import { useAccount, usePublicClient, useWriteContract } from "wagmi";
 import { useMarkets } from "~~/hooks/useMarkets";
 
-// ABI for the addLiquidity function
+// ABI for the liquidity functions
 const POLYBET_ABI = [
   {
     inputs: [],
@@ -17,13 +17,72 @@ const POLYBET_ABI = [
     stateMutability: "payable",
     type: "function",
   },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_ethToWithdraw",
+        type: "uint256",
+      },
+    ],
+    name: "removeLiquidity",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "_user",
+        type: "address",
+      },
+    ],
+    name: "getUserLiquidityInfo",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "userContribution",
+        type: "uint256",
+      },
+      {
+        internalType: "uint256",
+        name: "totalLiquidity",
+        type: "uint256",
+      },
+      {
+        internalType: "bool",
+        name: "hasContribution",
+        type: "bool",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
+  {
+    inputs: [],
+    name: "totalLiquidityProvided",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 const LiquidityProvider: NextPage = () => {
   const { address } = useAccount();
+  const publicClient = usePublicClient();
   const [selectedBet, setSelectedBet] = useState<string | null>(null);
   const [liquidityAmount, setLiquidityAmount] = useState("");
+  const [removeAmount, setRemoveAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [userLiquidityContributions, setUserLiquidityContributions] = useState<Record<string, number>>({});
+  const [marketTotalLiquidity, setMarketTotalLiquidity] = useState<Record<string, number>>({});
 
   // Fetch markets from database
   const {
@@ -38,8 +97,92 @@ const LiquidityProvider: NextPage = () => {
 
   const markets = marketsData?.markets || [];
 
+  // Memoize market addresses to prevent infinite loops
+  const marketAddresses = useMemo(() => markets.map(m => m.address), [markets]);
+
   // Get the write contract hook
   const { writeContractAsync } = useWriteContract();
+
+  // Fetch total liquidity for all markets
+  const fetchMarketTotalLiquidity = useCallback(async () => {
+    if (!publicClient || markets.length === 0) {
+      setMarketTotalLiquidity({});
+      return;
+    }
+
+    try {
+      const totalLiquidity: Record<string, number> = {};
+
+      // Fetch total liquidity for each market
+      for (const market of markets) {
+        try {
+          const totalLiquidityProvided = await publicClient.readContract({
+            address: market.address as `0x${string}`,
+            abi: POLYBET_ABI,
+            functionName: "totalLiquidityProvided",
+          });
+
+          totalLiquidity[market.address] = parseFloat(formatEther(totalLiquidityProvided as bigint));
+        } catch (error) {
+          console.error(`Error fetching total liquidity for market ${market.address}:`, error);
+          // Fallback to initial liquidity from database if contract call fails
+          totalLiquidity[market.address] = parseFloat(market.initialLiquidity);
+        }
+      }
+
+      setMarketTotalLiquidity(totalLiquidity);
+    } catch (error) {
+      console.error("Error fetching market total liquidity:", error);
+      setMarketTotalLiquidity({});
+    }
+  }, [publicClient, marketAddresses]);
+
+  // Fetch user liquidity contributions for all markets
+  const fetchUserLiquidityContributions = useCallback(async () => {
+    if (!address || !publicClient || markets.length === 0) {
+      setUserLiquidityContributions({});
+      return;
+    }
+
+    try {
+      const contributions: Record<string, number> = {};
+
+      // Fetch liquidity info for each market
+      for (const market of markets) {
+        try {
+          const liquidityInfo = await publicClient.readContract({
+            address: market.address as `0x${string}`,
+            abi: POLYBET_ABI,
+            functionName: "getUserLiquidityInfo",
+            args: [address],
+          });
+
+          const userContribution = parseFloat(formatEther(liquidityInfo[0] as bigint));
+          if (userContribution > 0) {
+            contributions[market.address] = userContribution;
+          }
+        } catch (error) {
+          console.error(`Error fetching liquidity for market ${market.address}:`, error);
+          contributions[market.address] = 0;
+        }
+      }
+
+      setUserLiquidityContributions(contributions);
+    } catch (error) {
+      console.error("Error fetching user liquidity contributions:", error);
+      setUserLiquidityContributions({});
+    }
+  }, [address, publicClient, marketAddresses]);
+
+  // Fetch liquidity data when address or market addresses change
+  useEffect(() => {
+    if (publicClient && marketAddresses.length > 0) {
+      fetchMarketTotalLiquidity();
+      if (address) {
+        fetchUserLiquidityContributions();
+      }
+    }
+  }, [address, publicClient, marketAddresses, fetchMarketTotalLiquidity, fetchUserLiquidityContributions]);
 
   const handleAddLiquidity = async () => {
     if (!selectedBet || !liquidityAmount || !address) return;
@@ -64,12 +207,65 @@ const LiquidityProvider: NextPage = () => {
       console.log("Liquidity added successfully!");
       alert("Liquidity added successfully!");
 
-      // Reset form
+      // Reset form and refresh liquidity data
       setLiquidityAmount("");
       setSelectedBet(null);
+
+      // Refresh liquidity data after a short delay
+      setTimeout(() => {
+        fetchMarketTotalLiquidity();
+        fetchUserLiquidityContributions();
+      }, 2000);
     } catch (error) {
       console.error("Error adding liquidity:", error);
-      alert("Failed to add liquidity. Please check if you are the owner of this market and try again.");
+      alert("Failed to add liquidity. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemoveLiquidity = async () => {
+    if (!selectedBet || !removeAmount || !address) return;
+
+    // Validate input
+    const amount = parseFloat(removeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid amount to remove");
+      return;
+    }
+
+    // Check if user has enough liquidity
+    const userContribution = userLiquidityContributions[selectedBet] || 0;
+    if (amount > userContribution) {
+      alert(`You can only remove up to ${userContribution} ETH`);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Call the removeLiquidity function on the selected market contract
+      await writeContractAsync({
+        address: selectedBet as `0x${string}`,
+        abi: POLYBET_ABI,
+        functionName: "removeLiquidity",
+        args: [parseEther(removeAmount)],
+      });
+
+      console.log("Liquidity removed successfully!");
+      alert("Liquidity removed successfully!");
+
+      // Reset form and refresh liquidity data
+      setRemoveAmount("");
+      setSelectedBet(null);
+
+      // Refresh liquidity data after a short delay
+      setTimeout(() => {
+        fetchMarketTotalLiquidity();
+        fetchUserLiquidityContributions();
+      }, 2000);
+    } catch (error) {
+      console.error("Error removing liquidity:", error);
+      alert("Failed to remove liquidity. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -172,23 +368,22 @@ const LiquidityProvider: NextPage = () => {
                       const yesProbability = market.initialYesProbability;
                       //const noProbability = 100 - yesProbability;
                       const expirationDate = new Date(market.expirationTime).toLocaleDateString();
-                      const currentLiquidity = parseFloat(market.initialLiquidity).toFixed(2);
+                      const currentLiquidity = marketTotalLiquidity[market.address]
+                        ? marketTotalLiquidity[market.address].toFixed(2)
+                        : parseFloat(market.initialLiquidity).toFixed(2);
                       const totalVolume = parseFloat(market.totalVolume).toFixed(2);
                       const isOwner = address && market.creatorAddress?.toLowerCase() === address.toLowerCase();
-                      const canAddLiquidity = isOwner;
+                      const userContribution = userLiquidityContributions[market.address] || 0;
+                      const hasUserContribution = userContribution > 0;
 
                       return (
                         <div
                           key={market.id}
-                          onClick={() => canAddLiquidity && setSelectedBet(market.address)}
-                          className={`p-6 border-2 rounded-lg transition-all ${
-                            canAddLiquidity
-                              ? `cursor-pointer ${
-                                  selectedBet === market.address
-                                    ? "border-blue-500 bg-blue-50"
-                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
-                                }`
-                              : "border-gray-200 bg-gray-100 cursor-not-allowed opacity-60"
+                          onClick={() => setSelectedBet(market.address)}
+                          className={`p-6 border-2 rounded-lg transition-all cursor-pointer ${
+                            selectedBet === market.address
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                           }`}
                         >
                           <div className="flex items-start justify-between">
@@ -203,9 +398,9 @@ const LiquidityProvider: NextPage = () => {
                                     Your Market
                                   </span>
                                 )}
-                                {!canAddLiquidity && address && (
-                                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
-                                    Not Your Market
+                                {hasUserContribution && (
+                                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                                    Your Liquidity: {userContribution.toFixed(4)} ETH
                                   </span>
                                 )}
                               </div>
@@ -270,7 +465,7 @@ const LiquidityProvider: NextPage = () => {
                   className="text-2xl font-bold text-gray-900 mb-6"
                   style={{ fontFamily: "PolySans Median, sans-serif" }}
                 >
-                  Add Liquidity
+                  Manage Liquidity
                 </h2>
 
                 {!address ? (
@@ -295,10 +490,18 @@ const LiquidityProvider: NextPage = () => {
                       <p className="text-sm text-gray-600">
                         {markets.find(market => market.address === selectedBet)?.question}
                       </p>
-                      <div className="mt-2">
-                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                          Your Market
-                        </span>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {markets.find(market => market.address === selectedBet)?.creatorAddress?.toLowerCase() ===
+                          address?.toLowerCase() && (
+                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                            Your Market
+                          </span>
+                        )}
+                        {userLiquidityContributions[selectedBet] > 0 && (
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                            Your Liquidity: {userLiquidityContributions[selectedBet].toFixed(4)} ETH
+                          </span>
+                        )}
                       </div>
                     </div>
 
@@ -351,11 +554,56 @@ const LiquidityProvider: NextPage = () => {
                       {isLoading ? "Adding Liquidity..." : "Add Liquidity"}
                     </button>
 
+                    {/* Remove Liquidity Section */}
+                    {userLiquidityContributions[selectedBet] > 0 && (
+                      <>
+                        <div className="mt-8 pt-6 border-t border-gray-200">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-4">Remove Liquidity</h3>
+
+                          {/* Remove Amount Input */}
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Amount to Remove (ETH)
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="number"
+                                value={removeAmount}
+                                onChange={e => setRemoveAmount(e.target.value)}
+                                placeholder="0.0"
+                                max={userLiquidityContributions[selectedBet]}
+                                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                              />
+                              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <span className="text-gray-500 text-sm">ETH</span>
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Max: {userLiquidityContributions[selectedBet].toFixed(4)} ETH
+                            </p>
+                          </div>
+
+                          {/* Remove Liquidity Button */}
+                          <button
+                            onClick={handleRemoveLiquidity}
+                            disabled={!removeAmount || isLoading}
+                            className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
+                              removeAmount && !isLoading
+                                ? "bg-red-600 hover:bg-red-700 text-white"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                          >
+                            {isLoading ? "Removing..." : "Remove Liquidity"}
+                          </button>
+                        </div>
+                      </>
+                    )}
+
                     {/* Info */}
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
-                        💡 You&apos;ll earn trading fees proportional to your liquidity share. Liquidity can be
-                        withdrawn after the market resolves.
+                        💡 You&apos;ll earn trading fees proportional to your liquidity share. You can withdraw your
+                        liquidity at any time before the market is reported.
                       </p>
                     </div>
                   </>
@@ -371,8 +619,8 @@ const LiquidityProvider: NextPage = () => {
                         />
                       </svg>
                     </div>
-                    <p className="text-gray-500 mb-2">Select one of your markets to add liquidity</p>
-                    <p className="text-sm text-gray-400">Only market creators can add liquidity</p>
+                    <p className="text-gray-500 mb-2">Select a market to add liquidity</p>
+                    <p className="text-sm text-gray-400">Anyone can add liquidity to any active market</p>
                   </div>
                 )}
               </div>
@@ -412,7 +660,7 @@ const LiquidityProvider: NextPage = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Withdraw</h3>
                 <p className="text-gray-600 text-sm">
-                  Withdraw your liquidity plus earned fees after the market resolves
+                  Withdraw your liquidity plus earned fees at any time before the market is reported
                 </p>
               </div>
             </div>
