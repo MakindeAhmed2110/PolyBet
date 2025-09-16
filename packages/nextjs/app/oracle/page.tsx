@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import type { NextPage } from "next";
 import { useAccount } from "wagmi";
 import { OracleAddress } from "~~/components/oracle/OracleAddress";
@@ -32,11 +33,13 @@ const Oracle: NextPage = () => {
   const oracleAddress = factoryInfo?.[0] as string;
   const isOracle = address && oracleAddress && address.toLowerCase() === oracleAddress.toLowerCase();
 
-  // Fetch all markets for oracle dashboard
+  // Fetch all markets for oracle dashboard with real-time updates
   const {
     data: allMarketsData,
     isLoading: allMarketsLoading,
     error: allMarketsError,
+    refetch: refetchMarkets,
+    isFetching: isRefreshing,
   } = useMarkets({
     sortBy: "createdAt",
     sortOrder: "desc",
@@ -48,6 +51,55 @@ const Oracle: NextPage = () => {
   const activeMarkets = allMarkets.filter(market => market.status === "ACTIVE");
   const reportedMarkets = allMarkets.filter(market => market.status === "REPORTED");
   const resolvedMarkets = allMarkets.filter(market => market.status === "RESOLVED");
+
+  // Track previous counts for animations
+  const prevCounts = useRef({ active: 0, reported: 0, resolved: 0 });
+  const [showUpdateAnimation, setShowUpdateAnimation] = useState(false);
+
+  // Auto-refresh markets every 30 seconds
+  useEffect(() => {
+    const interval = setInterval(() => {
+      refetchMarkets();
+    }, 30000); // Refresh every 30 seconds
+
+    return () => clearInterval(interval);
+  }, [refetchMarkets]);
+
+  // Show notification when data is refreshed and detect changes
+  useEffect(() => {
+    if (isRefreshing && allMarketsData) {
+      console.log("Markets data refreshed at:", new Date().toLocaleTimeString());
+    }
+  }, [isRefreshing, allMarketsData]);
+
+  // Detect changes in market counts and show animation
+  useEffect(() => {
+    const currentCounts = {
+      active: activeMarkets.length,
+      reported: reportedMarkets.length,
+      resolved: resolvedMarkets.length,
+    };
+
+    const hasChanged =
+      currentCounts.active !== prevCounts.current.active ||
+      currentCounts.reported !== prevCounts.current.reported ||
+      currentCounts.resolved !== prevCounts.current.resolved;
+
+    if (hasChanged && prevCounts.current.active > 0) {
+      setShowUpdateAnimation(true);
+      setTimeout(() => setShowUpdateAnimation(false), 2000);
+    }
+
+    prevCounts.current = currentCounts;
+  }, [activeMarkets.length, reportedMarkets.length, resolvedMarkets.length]);
+
+  // Manual refresh function
+  const handleManualRefresh = () => {
+    refetchMarkets();
+  };
+
+  // Get last updated time
+  const lastUpdated = allMarketsData ? new Date().toLocaleTimeString() : null;
 
   if (isFactoryLoading || isRegistryLoading || isMarketsLoading || allMarketsLoading) {
     return (
@@ -81,6 +133,38 @@ const Oracle: NextPage = () => {
                 </h1>
               </div>
               <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  {isRefreshing && (
+                    <div className="flex items-center space-x-1 text-xs text-blue-600">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></div>
+                      <span>Live</span>
+                    </div>
+                  )}
+                  <button
+                    onClick={handleManualRefresh}
+                    className="btn btn-sm btn-outline"
+                    disabled={allMarketsLoading || isRefreshing}
+                  >
+                    {allMarketsLoading || isRefreshing ? (
+                      <>
+                        <span className="loading loading-spinner loading-xs"></span>
+                        {allMarketsLoading ? "Loading..." : "Refreshing..."}
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                          />
+                        </svg>
+                        Refresh
+                      </>
+                    )}
+                  </button>
+                </div>
                 {isOracle ? (
                   <div className="flex items-center space-x-2">
                     <div className="w-2 h-2 bg-green-500 rounded-full"></div>
@@ -120,7 +204,11 @@ const Oracle: NextPage = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
+            <div
+              className={`bg-white rounded-lg shadow p-6 transition-all duration-500 ${
+                showUpdateAnimation ? "ring-2 ring-yellow-400 bg-yellow-50" : ""
+              }`}
+            >
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
@@ -134,7 +222,11 @@ const Oracle: NextPage = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
+            <div
+              className={`bg-white rounded-lg shadow p-6 transition-all duration-500 ${
+                showUpdateAnimation ? "ring-2 ring-green-400 bg-green-50" : ""
+              }`}
+            >
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
@@ -148,7 +240,11 @@ const Oracle: NextPage = () => {
               </div>
             </div>
 
-            <div className="bg-white rounded-lg shadow p-6">
+            <div
+              className={`bg-white rounded-lg shadow p-6 transition-all duration-500 ${
+                showUpdateAnimation ? "ring-2 ring-purple-400 bg-purple-50" : ""
+              }`}
+            >
               <div className="flex items-center">
                 <div className="flex-shrink-0">
                   <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
@@ -167,14 +263,17 @@ const Oracle: NextPage = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Report Prediction */}
             <div>
-              <ReportPrediction />
+              <ReportPrediction onMarketReported={refetchMarkets} />
             </div>
 
             {/* Markets Overview */}
             <div>
               <div className="card bg-base-100 w-full shadow-xl">
                 <div className="card-body">
-                  <h2 className="card-title">Markets Overview</h2>
+                  <div className="flex items-center justify-between mb-4">
+                    <h2 className="card-title">Markets Overview</h2>
+                    {lastUpdated && <div className="text-xs text-gray-500">Last updated: {lastUpdated}</div>}
+                  </div>
 
                   {/* Active Markets */}
                   <div className="mb-6">

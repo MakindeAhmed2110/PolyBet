@@ -22,7 +22,11 @@ const POLYBET_ABI = [
   },
 ] as const;
 
-export function ReportPrediction() {
+interface ReportPredictionProps {
+  onMarketReported?: () => void;
+}
+
+export function ReportPrediction({ onMarketReported }: ReportPredictionProps) {
   const { address } = useAccount();
   const publicClient = usePublicClient();
   const { writeContractAsync } = useWriteContract();
@@ -97,6 +101,11 @@ export function ReportPrediction() {
       // Reset form
       setSelectedMarket(null);
       setSelectedOutcome(null);
+
+      // Trigger parent component refresh
+      if (onMarketReported) {
+        onMarketReported();
+      }
     } catch (error) {
       console.error("Error reporting market:", error);
       alert("Failed to report market. Please try again.");

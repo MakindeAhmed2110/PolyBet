@@ -552,7 +552,8 @@ const MarketDetail: NextPage = () => {
   const handleRedeemTokens = async () => {
     if (!address || !marketAddress) return;
 
-    const isWinningToken = winningToken && winningToken.toLowerCase().includes("yes") ? "yes" : "no";
+    const isWinningToken =
+      winningToken && yesToken && winningToken.toLowerCase() === yesToken.toLowerCase() ? "yes" : "no";
     const winningBalance = isWinningToken === "yes" ? userYesBalance : userNoBalance;
 
     if (parseFloat(winningBalance) <= 0) {
@@ -1045,7 +1046,9 @@ const MarketDetail: NextPage = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Winning Outcome:</span>
                         <span className="font-medium text-green-600">
-                          {winningToken && winningToken.toLowerCase().includes("yes") ? "YES" : "NO"}
+                          {winningToken && yesToken && winningToken.toLowerCase() === yesToken.toLowerCase()
+                            ? "YES"
+                            : "NO"}
                         </span>
                       </div>
                       <div className="flex justify-between">
@@ -1107,14 +1110,17 @@ const MarketDetail: NextPage = () => {
                       <div className="flex justify-between">
                         <span className="text-gray-600">Winning Outcome:</span>
                         <span className="font-medium text-green-600">
-                          {winningToken && winningToken.toLowerCase().includes("yes") ? "YES" : "NO"}
+                          {winningToken && yesToken && winningToken.toLowerCase() === yesToken.toLowerCase()
+                            ? "YES"
+                            : "NO"}
                         </span>
                       </div>
                     </div>
                   </div>
 
                   {(() => {
-                    const isWinningToken = winningToken && winningToken.toLowerCase().includes("yes") ? "yes" : "no";
+                    const isWinningToken =
+                      winningToken && yesToken && winningToken.toLowerCase() === yesToken.toLowerCase() ? "yes" : "no";
                     const winningBalance = isWinningToken === "yes" ? userYesBalance : userNoBalance;
                     const canRedeem = parseFloat(winningBalance) > 0;
 
