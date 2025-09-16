@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import type { NextPage } from "next";
@@ -177,6 +177,26 @@ const POLYBET_ABI = [
     stateMutability: "view",
     type: "function",
   },
+  // ERC20 balanceOf function
+  {
+    inputs: [
+      {
+        internalType: "address",
+        name: "account",
+        type: "address",
+      },
+    ],
+    name: "balanceOf",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "view",
+    type: "function",
+  },
 ] as const;
 
 const MarketDetail: NextPage = () => {
@@ -204,6 +224,46 @@ const MarketDetail: NextPage = () => {
   // State for real-time probabilities
   const [yesProbability, setYesProbability] = useState(50);
   const [noProbability, setNoProbability] = useState(50);
+
+  // State for user token balances
+  const [userYesBalance, setUserYesBalance] = useState("0");
+  const [userNoBalance, setUserNoBalance] = useState("0");
+
+  // Fetch user token balances
+  const fetchUserBalances = useCallback(async () => {
+    if (!address || !marketData || !publicClient) {
+      setUserYesBalance("0");
+      setUserNoBalance("0");
+      return;
+    }
+
+    try {
+      const yesTokenAddress = marketData[8] as string;
+      const noTokenAddress = marketData[9] as string;
+
+      const [yesBalance, noBalance] = await Promise.all([
+        publicClient.readContract({
+          address: yesTokenAddress as `0x${string}`,
+          abi: POLYBET_ABI,
+          functionName: "balanceOf",
+          args: [address],
+        }),
+        publicClient.readContract({
+          address: noTokenAddress as `0x${string}`,
+          abi: POLYBET_ABI,
+          functionName: "balanceOf",
+          args: [address],
+        }),
+      ]);
+
+      setUserYesBalance(formatEther(yesBalance as bigint));
+      setUserNoBalance(formatEther(noBalance as bigint));
+    } catch (error) {
+      console.error("Error fetching user balances:", error);
+      setUserYesBalance("0");
+      setUserNoBalance("0");
+    }
+  }, [address, marketData, publicClient]);
 
   // Calculate current probabilities based on tokens sold (not reserves)
   const calculateProbabilities = async () => {
@@ -258,6 +318,11 @@ const MarketDetail: NextPage = () => {
   useEffect(() => {
     calculateProbabilities();
   }, [marketData, publicClient]);
+
+  // Fetch user balances when address or market data changes
+  useEffect(() => {
+    fetchUserBalances();
+  }, [fetchUserBalances]);
 
   // Poll for market data updates every 5 seconds to get real-time probabilities
   useEffect(() => {
@@ -378,9 +443,10 @@ const MarketDetail: NextPage = () => {
       console.log("Tokens purchased successfully!");
       alert("Tokens purchased successfully!");
 
-      // Immediately refresh probabilities to show the impact of the trade
+      // Immediately refresh probabilities and balances to show the impact of the trade
       setTimeout(() => {
         calculateProbabilities();
+        fetchUserBalances();
       }, 2000); // Wait 2 seconds for transaction to be mined
 
       // Reset form
@@ -572,6 +638,155 @@ const MarketDetail: NextPage = () => {
                     </p>
                   </div>
                 </div>
+
+                {/* Token Information */}
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Token Information</h3>
+                  <div className="grid grid-cols-1 gap-4">
+                    {/* Yes Token Stats */}
+                    <div className="bg-green-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-green-800">Yes Tokens</span>
+                        <span className="text-xs text-green-600">Available to Buy</span>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-green-700">Available:</span>
+                          <span className="font-semibold text-green-900">
+                            {marketData ? formatEther(marketData[5] as bigint) : "0"} tokens
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-green-700">Your Balance:</span>
+                          <span className="font-semibold text-green-900">Connected to see</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-green-700">Token Address:</span>
+                          <span className="font-mono text-xs text-green-600 truncate">
+                            {marketData
+                              ? (marketData[8] as string).slice(0, 10) + "..." + (marketData[8] as string).slice(-8)
+                              : "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* No Token Stats */}
+                    <div className="bg-red-50 rounded-lg p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-red-800">No Tokens</span>
+                        <span className="text-xs text-red-600">Available to Buy</span>
+                      </div>
+                      <div className="space-y-2">
+                        <div className="flex justify-between text-sm">
+                          <span className="text-red-700">Available:</span>
+                          <span className="font-semibold text-red-900">
+                            {marketData ? formatEther(marketData[6] as bigint) : "0"} tokens
+                          </span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-red-700">Your Balance:</span>
+                          <span className="font-semibold text-red-900">Connected to see</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-red-700">Token Address:</span>
+                          <span className="font-mono text-xs text-red-600 truncate">
+                            {marketData
+                              ? (marketData[9] as string).slice(0, 10) + "..." + (marketData[9] as string).slice(-8)
+                              : "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Market Details */}
+                <div className="mt-6 pt-4 border-t border-gray-200">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-4">Market Details</h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Initial Token Value:</span>
+                      <span className="font-semibold text-gray-900">
+                        {marketData ? formatEther(marketData[4] as bigint) : "0"} ETH
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Initial Yes Probability:</span>
+                      <span className="font-semibold text-gray-900">{marketData ? Number(marketData[14]) : 0}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Percentage Locked:</span>
+                      <span className="font-semibold text-gray-900">{marketData ? Number(marketData[15]) : 0}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">ETH Collateral:</span>
+                      <span className="font-semibold text-gray-900">
+                        {marketData ? formatEther(marketData[11] as bigint) : "0"} ETH
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">LP Trading Revenue:</span>
+                      <span className="font-semibold text-gray-900">
+                        {marketData ? formatEther(marketData[12] as bigint) : "0"} ETH
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Expiration:</span>
+                      <span className="font-semibold text-gray-900">
+                        {marketData ? new Date(Number(marketData[18]) * 1000).toLocaleString() : "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Creator:</span>
+                      <span className="font-mono text-xs text-gray-600 truncate">
+                        {marketData
+                          ? (marketData[16] as string).slice(0, 10) + "..." + (marketData[16] as string).slice(-8)
+                          : "N/A"}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Oracle:</span>
+                      <span className="font-mono text-xs text-gray-600 truncate">
+                        {marketData
+                          ? (marketData[3] as string).slice(0, 10) + "..." + (marketData[3] as string).slice(-8)
+                          : "N/A"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                {/* User Token Balances */}
+                {address && (
+                  <div className="mt-6 pt-4 border-t border-gray-200">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Token Balances</h3>
+                    <div className="grid grid-cols-1 gap-4">
+                      {/* Yes Token Balance */}
+                      <div className="bg-green-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-green-800">Your Yes Tokens</span>
+                          <span className="text-xs text-green-600">Balance</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-green-700">Balance:</span>
+                          <span className="font-semibold text-green-900">{userYesBalance} tokens</span>
+                        </div>
+                      </div>
+
+                      {/* No Token Balance */}
+                      <div className="bg-red-50 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-sm font-medium text-red-800">Your No Tokens</span>
+                          <span className="text-xs text-red-600">Balance</span>
+                        </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-red-700">Balance:</span>
+                          <span className="font-semibold text-red-900">{userNoBalance} tokens</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
