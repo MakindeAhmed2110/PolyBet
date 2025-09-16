@@ -4,9 +4,23 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import type { NextPage } from "next";
+import { parseEther } from "viem";
+import { useAccount, useWriteContract } from "wagmi";
 import { useMarkets } from "~~/hooks/useMarkets";
 
+// ABI for the addLiquidity function
+const POLYBET_ABI = [
+  {
+    inputs: [],
+    name: "addLiquidity",
+    outputs: [],
+    stateMutability: "payable",
+    type: "function",
+  },
+] as const;
+
 const LiquidityProvider: NextPage = () => {
+  const { address } = useAccount();
   const [selectedBet, setSelectedBet] = useState<string | null>(null);
   const [liquidityAmount, setLiquidityAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -24,22 +38,38 @@ const LiquidityProvider: NextPage = () => {
 
   const markets = marketsData?.markets || [];
 
+  // Get the write contract hook
+  const { writeContractAsync } = useWriteContract();
+
   const handleAddLiquidity = async () => {
-    if (!selectedBet || !liquidityAmount) return;
+    if (!selectedBet || !liquidityAmount || !address) return;
+
+    // Validate input
+    const amount = parseFloat(liquidityAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid liquidity amount");
+      return;
+    }
 
     setIsLoading(true);
     try {
-      // await writePredictionMarketAsync({
-      //   functionName: "updateMarketStatus",
-      //   args: [selectedBet, true],
-      // });
+      // Call the addLiquidity function on the selected market contract
+      await writeContractAsync({
+        address: selectedBet as `0x${string}`,
+        abi: POLYBET_ABI,
+        functionName: "addLiquidity",
+        value: parseEther(liquidityAmount),
+      });
 
       console.log("Liquidity added successfully!");
+      alert("Liquidity added successfully!");
+
       // Reset form
       setLiquidityAmount("");
       setSelectedBet(null);
     } catch (error) {
       console.error("Error adding liquidity:", error);
+      alert("Failed to add liquidity. Please check if you are the owner of this market and try again.");
     } finally {
       setIsLoading(false);
     }
@@ -128,6 +158,13 @@ const LiquidityProvider: NextPage = () => {
                   </div>
                 )}
 
+                {/* Wallet Not Connected */}
+                {!address && !marketsLoading && !marketsError && markets.length > 0 && (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 mb-4">Please connect your wallet to add liquidity to markets.</p>
+                  </div>
+                )}
+
                 {/* Markets List */}
                 {!marketsLoading && !marketsError && markets.length > 0 && (
                   <div className="space-y-4">
@@ -137,15 +174,21 @@ const LiquidityProvider: NextPage = () => {
                       const expirationDate = new Date(market.expirationTime).toLocaleDateString();
                       const currentLiquidity = parseFloat(market.initialLiquidity).toFixed(2);
                       const totalVolume = parseFloat(market.totalVolume).toFixed(2);
+                      const isOwner = address && market.creatorAddress?.toLowerCase() === address.toLowerCase();
+                      const canAddLiquidity = isOwner;
 
                       return (
                         <div
                           key={market.id}
-                          onClick={() => setSelectedBet(market.address)}
-                          className={`p-6 border-2 rounded-lg cursor-pointer transition-all ${
-                            selectedBet === market.address
-                              ? "border-blue-500 bg-blue-50"
-                              : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                          onClick={() => canAddLiquidity && setSelectedBet(market.address)}
+                          className={`p-6 border-2 rounded-lg transition-all ${
+                            canAddLiquidity
+                              ? `cursor-pointer ${
+                                  selectedBet === market.address
+                                    ? "border-blue-500 bg-blue-50"
+                                    : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                                }`
+                              : "border-gray-200 bg-gray-100 cursor-not-allowed opacity-60"
                           }`}
                         >
                           <div className="flex items-start justify-between">
@@ -155,6 +198,16 @@ const LiquidityProvider: NextPage = () => {
                                   {market.category.icon} {market.category.name}
                                 </span>
                                 <span className="text-gray-500 text-sm">{expirationDate}</span>
+                                {isOwner && (
+                                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                                    Your Market
+                                  </span>
+                                )}
+                                {!canAddLiquidity && address && (
+                                  <span className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-medium rounded">
+                                    Not Your Market
+                                  </span>
+                                )}
                               </div>
 
                               <h3
@@ -220,7 +273,21 @@ const LiquidityProvider: NextPage = () => {
                   Add Liquidity
                 </h2>
 
-                {selectedBet ? (
+                {!address ? (
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                        />
+                      </svg>
+                    </div>
+                    <p className="text-gray-500">Connect your wallet to add liquidity</p>
+                  </div>
+                ) : selectedBet ? (
                   <>
                     {/* Selected Market Info */}
                     <div className="mb-6 p-4 bg-blue-50 rounded-lg">
@@ -228,6 +295,11 @@ const LiquidityProvider: NextPage = () => {
                       <p className="text-sm text-gray-600">
                         {markets.find(market => market.address === selectedBet)?.question}
                       </p>
+                      <div className="mt-2">
+                        <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                          Your Market
+                        </span>
+                      </div>
                     </div>
 
                     {/* Amount Input */}
@@ -299,7 +371,8 @@ const LiquidityProvider: NextPage = () => {
                         />
                       </svg>
                     </div>
-                    <p className="text-gray-500">Select a market to add liquidity</p>
+                    <p className="text-gray-500 mb-2">Select one of your markets to add liquidity</p>
+                    <p className="text-sm text-gray-400">Only market creators can add liquidity</p>
                   </div>
                 )}
               </div>

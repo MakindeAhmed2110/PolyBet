@@ -58,7 +58,7 @@ const Home: NextPage = () => {
             {/* Call to Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-5">
               <Link
-                href="/user"
+                href="/markets"
                 className="inline-flex items-center justify-center px-8 py-4 bg-black text-white font-semibold rounded-full hover:bg-gray-800 transition-colors"
                 style={{ fontFamily: "PolySans Neutral, sans-serif" }}
               >
