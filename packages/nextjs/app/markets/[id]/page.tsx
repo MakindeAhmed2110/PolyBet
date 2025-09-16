@@ -197,6 +197,32 @@ const POLYBET_ABI = [
     stateMutability: "view",
     type: "function",
   },
+  {
+    inputs: [],
+    name: "resolveMarketAndWithdraw",
+    outputs: [
+      {
+        internalType: "uint256",
+        name: "ethRedeemed",
+        type: "uint256",
+      },
+    ],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [
+      {
+        internalType: "uint256",
+        name: "_amount",
+        type: "uint256",
+      },
+    ],
+    name: "redeemWinningTokens",
+    outputs: [],
+    stateMutability: "nonpayable",
+    type: "function",
+  },
 ] as const;
 
 const MarketDetail: NextPage = () => {
@@ -468,6 +494,96 @@ const MarketDetail: NextPage = () => {
         alert("Market creators cannot trade on their own markets.");
       } else {
         alert("Failed to purchase tokens. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResolveMarket = async () => {
+    if (!address || !marketAddress) return;
+
+    setIsLoading(true);
+    try {
+      // Call the resolveMarketAndWithdraw function
+      const result = await writeContractAsync({
+        address: marketAddress as `0x${string}`,
+        abi: POLYBET_ABI,
+        functionName: "resolveMarketAndWithdraw",
+      });
+
+      console.log("Market resolved successfully!", result);
+
+      // Update database to reflect the resolution
+      try {
+        const response = await fetch(`/api/markets/${marketAddress}/resolve`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to update database");
+        }
+
+        console.log("Database updated successfully");
+      } catch (dbError) {
+        console.error("Error updating database:", dbError);
+        // Don't fail the entire operation if database update fails
+      }
+
+      alert("Market resolved successfully! You have received your funds.");
+    } catch (error) {
+      console.error("Error resolving market:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes("PredictionNotReported")) {
+        alert("Market must be reported by oracle before resolution.");
+      } else if (errorMessage.includes("OnlyOwner")) {
+        alert("Only the market owner can resolve the market.");
+      } else {
+        alert("Failed to resolve market. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRedeemTokens = async () => {
+    if (!address || !marketAddress) return;
+
+    const isWinningToken = winningToken && winningToken.toLowerCase().includes("yes") ? "yes" : "no";
+    const winningBalance = isWinningToken === "yes" ? userYesBalance : userNoBalance;
+
+    if (parseFloat(winningBalance) <= 0) {
+      alert("You don't have any winning tokens to redeem.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Call the redeemWinningTokens function
+      const result = await writeContractAsync({
+        address: marketAddress as `0x${string}`,
+        abi: POLYBET_ABI,
+        functionName: "redeemWinningTokens",
+        args: [parseEther(winningBalance)],
+      });
+
+      console.log("Tokens redeemed successfully!", result);
+      alert(`Successfully redeemed ${winningBalance} ${isWinningToken.toUpperCase()} tokens for ETH!`);
+
+      // Refresh user balances
+      await fetchUserBalances();
+    } catch (error) {
+      console.error("Error redeeming tokens:", error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      if (errorMessage.includes("InsufficientWinningTokens")) {
+        alert("You don't have enough winning tokens to redeem.");
+      } else if (errorMessage.includes("PredictionNotReported")) {
+        alert("Market must be reported and resolved before token redemption.");
+      } else {
+        alert("Failed to redeem tokens. Please try again.");
       }
     } finally {
       setIsLoading(false);
@@ -909,6 +1025,147 @@ const MarketDetail: NextPage = () => {
                 )}
               </div>
             </div>
+
+            {/* Market Resolution Interface - Only for Market Owner */}
+            {address && creator && address.toLowerCase() === creator.toLowerCase() && status === 1 && (
+              <div className="lg:col-span-1">
+                <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Market Resolution</h2>
+
+                  <div className="mb-6 p-4 bg-yellow-50 rounded-lg">
+                    <h3 className="font-semibold text-yellow-800 mb-2">Oracle Reported Outcome</h3>
+                    <p className="text-sm text-yellow-700">
+                      The oracle has reported the winning outcome. You can now resolve the market and withdraw funds.
+                    </p>
+                  </div>
+
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-gray-900 mb-2">Resolution Details</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Winning Outcome:</span>
+                        <span className="font-medium text-green-600">
+                          {winningToken && winningToken.toLowerCase().includes("yes") ? "YES" : "NO"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">ETH Collateral:</span>
+                        <span className="font-medium">{formatEther(ethCollateral || 0n)} ETH</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Trading Revenue:</span>
+                        <span className="font-medium">{formatEther(lpTradingRevenue || 0n)} ETH</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    onClick={handleResolveMarket}
+                    disabled={isLoading}
+                    className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
+                      !isLoading
+                        ? "bg-green-600 hover:bg-green-700 text-white"
+                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    }`}
+                  >
+                    {isLoading ? "Resolving..." : "Resolve Market & Withdraw"}
+                  </button>
+
+                  <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      💰 You&apos;ll receive your remaining collateral plus all trading fees.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Token Redemption Interface - For Resolved Markets */}
+            {address && status === 2 && (userYesBalance !== "0" || userNoBalance !== "0") && (
+              <div className="lg:col-span-1">
+                <div className="bg-white border border-gray-200 rounded-xl p-6 sticky top-8">
+                  <h2 className="text-2xl font-bold text-gray-900 mb-6">Redeem Winning Tokens</h2>
+
+                  <div className="mb-6 p-4 bg-green-50 rounded-lg">
+                    <h3 className="font-semibold text-green-800 mb-2">Market Resolved</h3>
+                    <p className="text-sm text-green-700">
+                      This market has been resolved. You can redeem your winning tokens for ETH.
+                    </p>
+                  </div>
+
+                  <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                    <h4 className="font-semibold text-gray-900 mb-2">Your Token Balances</h4>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">YES Tokens:</span>
+                        <span className="font-medium">{userYesBalance}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">NO Tokens:</span>
+                        <span className="font-medium">{userNoBalance}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Winning Outcome:</span>
+                        <span className="font-medium text-green-600">
+                          {winningToken && winningToken.toLowerCase().includes("yes") ? "YES" : "NO"}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {(() => {
+                    const isWinningToken = winningToken && winningToken.toLowerCase().includes("yes") ? "yes" : "no";
+                    const winningBalance = isWinningToken === "yes" ? userYesBalance : userNoBalance;
+                    const canRedeem = parseFloat(winningBalance) > 0;
+
+                    if (!canRedeem) {
+                      return (
+                        <div className="text-center py-4">
+                          <p className="text-gray-500">You don't have any winning tokens to redeem.</p>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <>
+                        <div className="mb-6 p-4 bg-blue-50 rounded-lg">
+                          <h4 className="font-semibold text-blue-800 mb-2">Redemption Value</h4>
+                          <p className="text-sm text-blue-700">
+                            You can redeem {winningBalance} {isWinningToken.toUpperCase()} tokens for approximately{" "}
+                            {(
+                              (parseFloat(winningBalance) * parseFloat(formatEther(ethCollateral || 0n))) /
+                              (parseFloat(formatEther(ethCollateral || 0n)) +
+                                parseFloat(formatEther(lpTradingRevenue || 0n)))
+                            ).toFixed(4)}{" "}
+                            ETH
+                          </p>
+                        </div>
+
+                        <button
+                          onClick={handleRedeemTokens}
+                          disabled={isLoading}
+                          className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
+                            !isLoading
+                              ? "bg-green-600 hover:bg-green-700 text-white"
+                              : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                          }`}
+                        >
+                          {isLoading
+                            ? "Redeeming..."
+                            : `Redeem ${winningBalance} ${isWinningToken.toUpperCase()} Tokens`}
+                        </button>
+                      </>
+                    );
+                  })()}
+
+                  <div className="mt-4 p-3 bg-green-50 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      💰 Redeem your winning tokens to receive ETH based on the market outcome.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>
