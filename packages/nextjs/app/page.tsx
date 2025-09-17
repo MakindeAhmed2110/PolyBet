@@ -1,248 +1,103 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import type { NextPage } from "next";
-import { parseEther } from "viem";
-import { useAccount } from "wagmi";
-import { Address } from "~~/components/scaffold-eth";
-import { useScaffoldEventHistory, useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 
 const Home: NextPage = () => {
-  const { address: connectedAddress } = useAccount();
-  const [question, setQuestion] = useState("");
-  const [category, setCategory] = useState("crypto");
-  const [initialLiquidity, setInitialLiquidity] = useState("0.05");
-  const [probability, setProbability] = useState("50");
-  const [percentageLocked, setPercentageLocked] = useState("10");
-  const [expirationDays, setExpirationDays] = useState("7");
-
-  // Get factory contract
-  const { writeContractAsync } = useScaffoldWriteContract({
-    contractName: "PolyBetFactory",
-  });
-
-  // Listen for market creation events
-  const { data: marketEvents } = useScaffoldEventHistory({
-    contractName: "PolyBetFactory",
-    eventName: "MarketCreated",
-    fromBlock: 0n,
-  });
-
-  const [createdMarkets, setCreatedMarkets] = useState<any[]>([]);
-
-  useEffect(() => {
-    if (marketEvents) {
-      const formattedMarkets = marketEvents.map((event: any) => ({
-        address: event.args.marketAddress,
-        creator: event.args.creator,
-        question: event.args.question,
-        category: event.args.category,
-        timestamp: new Date(Number(event.args.creationTimestamp) * 1000).toLocaleString(),
-      }));
-      setCreatedMarkets(formattedMarkets);
-    }
-  }, [marketEvents]);
-
-  const handleCreateMarket = async () => {
-    if (!question.trim()) {
-      alert("Please enter a question");
-      return;
-    }
-
-    try {
-      const expirationTime = Math.floor(Date.now() / 1000) + parseInt(expirationDays) * 24 * 60 * 60;
-
-      await writeContractAsync({
-        functionName: "createMarket",
-        args: [
-          question,
-          category,
-          parseEther("0.01"), // token value
-          Number(probability), // probability
-          Number(percentageLocked), // percentage locked
-          BigInt(expirationTime), // expiration time
-        ],
-        value: parseEther(initialLiquidity),
-      });
-
-      alert("Market created successfully!");
-      setQuestion("");
-    } catch (error) {
-      console.error("Error creating market:", error);
-      alert("Error creating market. Check console for details.");
-    }
-  };
-
   return (
     <>
-      <div className="flex items-center flex-col grow pt-10">
-        <div className="px-5 max-w-4xl w-full">
-          <h1 className="text-center">
-            <span className="block text-2xl mb-2">Welcome to</span>
-            <span className="block text-4xl font-bold text-primary">PolyBet</span>
-            <span className="block text-lg mt-2">Decentralized Prediction Markets</span>
-          </h1>
+      {/* Hero Section */}
+      <section className="relative min-h-screen smooth-gradient overflow-hidden pt-16">
+        {/* Background Elements */}
+        <div className="absolute inset-0">
+          <div className="absolute top-20 left-10 w-72 h-72 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+          <div className="absolute top-40 right-20 w-96 h-96 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+          <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-gradient-to-r from-cyan-400/20 to-blue-400/20 rounded-full blur-3xl"></div>
+        </div>
 
-          <div className="flex justify-center items-center space-x-2 flex-col mb-8">
-            <p className="my-2 font-medium">Connected Address:</p>
-            <Address address={connectedAddress} />
-          </div>
-
-          {/* Market Creation Form */}
-          <div className="card bg-base-100 w-full shadow-xl mb-8">
-            <div className="card-body">
-              <h2 className="card-title">Create New Prediction Market</h2>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Question</span>
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="Will Bitcoin reach $100k by end of 2024?"
-                    className="input input-bordered"
-                    value={question}
-                    onChange={e => setQuestion(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Category</span>
-                  </label>
-                  <select
-                    className="select select-bordered"
-                    value={category}
-                    onChange={e => setCategory(e.target.value)}
-                  >
-                    <option value="crypto">Crypto</option>
-                    <option value="sports">Sports</option>
-                    <option value="politics">Politics</option>
-                    <option value="tech">Tech</option>
-                    <option value="other">Other</option>
-                  </select>
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Initial Liquidity (ETH)</span>
-                  </label>
-                  <input
-                    type="number"
-                    step="0.01"
-                    min="0.01"
-                    placeholder="0.05"
-                    className="input input-bordered"
-                    value={initialLiquidity}
-                    onChange={e => setInitialLiquidity(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Initial Probability (%)</span>
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="99"
-                    placeholder="50"
-                    className="input input-bordered"
-                    value={probability}
-                    onChange={e => setProbability(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Liquidity Lock (%)</span>
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="99"
-                    placeholder="10"
-                    className="input input-bordered"
-                    value={percentageLocked}
-                    onChange={e => setPercentageLocked(e.target.value)}
-                  />
-                </div>
-
-                <div className="form-control">
-                  <label className="label">
-                    <span className="label-text">Expiration (Days)</span>
-                  </label>
-                  <input
-                    type="number"
-                    min="1"
-                    max="365"
-                    placeholder="7"
-                    className="input input-bordered"
-                    value={expirationDays}
-                    onChange={e => setExpirationDays(e.target.value)}
-                  />
-                </div>
+        <div className="relative max-w-7xl mx-auto px-6 lg:px-8 py-20">
+          <div className="text-center space-y-8">
+            {/* Rating Section */}
+            <div className="flex items-center justify-center space-x-2 mb-8">
+              <div className="flex space-x-1">
+                {[...Array(5)].map((_, i) => (
+                  <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                  </svg>
+                ))}
               </div>
-
-              <div className="card-actions justify-end mt-6">
-                <button className="btn btn-primary" onClick={handleCreateMarket} disabled={!connectedAddress}>
-                  Create Market
-                </button>
-              </div>
+              <span className="text-gray-700 font-medium">Rated 5/5 from over 700 reviews</span>
             </div>
-          </div>
 
-          {/* Created Markets Display */}
-          <div className="card bg-base-100 w-full shadow-xl">
-            <div className="card-body">
-              <h2 className="card-title">Recent Markets</h2>
+            {/* Main Headline */}
+            <div className="space-y-6">
+              <h1
+                className="text-5xl lg:text-7xl font-bold text-gray-900 leading-tight"
+                style={{ fontFamily: "PolySans Median, sans-serif" }}
+              >
+                The Future of Prediction Markets — Unified, Optimized, Decentralized.
+              </h1>
+              <p
+                className="text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto"
+                style={{ fontFamily: "PolySans Neutral, sans-serif" }}
+              >
+                Experience the next generation of prediction markets with cutting-edge technology, seamless user
+                experience, and decentralized infrastructure.
+              </p>
+            </div>
 
-              {createdMarkets.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-lg">No markets created yet</p>
-                  <p className="text-sm text-gray-500 mt-2">Create your first prediction market above!</p>
-                </div>
-              ) : (
-                <div className="space-y-4">
-                  {createdMarkets.map((market, index) => (
-                    <div key={index} className="border border-base-300 rounded-lg p-4">
-                      <div className="flex justify-between items-start mb-2">
-                        <h3 className="font-semibold text-lg">{market.question}</h3>
-                        <span
-                          className={`badge ${
-                            market.category === "crypto"
-                              ? "badge-primary"
-                              : market.category === "sports"
-                                ? "badge-secondary"
-                                : market.category === "politics"
-                                  ? "badge-accent"
-                                  : "badge-neutral"
-                          }`}
-                        >
-                          {market.category}
-                        </span>
-                      </div>
+            {/* Live on Somnia Section */}
+            <div className="flex items-center justify-center space-x-3 py-2">
+              <span className="text-gray-700 font-medium" style={{ fontFamily: "PolySans Neutral, sans-serif" }}>
+                Live on
+              </span>
+              <Image src="/somnia.png" alt="$SOMI" width={80} height={24} className="h-6 w-auto" />
+            </div>
 
-                      <div className="flex justify-between items-center text-sm text-gray-500">
-                        <div className="flex items-center space-x-4">
-                          <span>
-                            Creator: <Address address={market.creator} format="short" />
-                          </span>
-                          <span>Created: {market.timestamp}</span>
-                        </div>
-                        <div className="text-xs">
-                          <Address address={market.address} format="short" />
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+            {/* Call to Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-5">
+              <Link
+                href="/markets"
+                className="inline-flex items-center justify-center px-8 py-4 bg-black text-white font-semibold rounded-full hover:bg-gray-800 transition-colors"
+                style={{ fontFamily: "PolySans Neutral, sans-serif" }}
+              >
+                <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.707l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Start Trading
+              </Link>
+              <Link
+                href="/liquidity-provider"
+                className="inline-flex items-center justify-center px-8 py-4 border-2 border-gray-300 text-gray-700 font-semibold rounded-full hover:border-gray-400 hover:bg-gray-50 transition-colors"
+                style={{ fontFamily: "PolySans Neutral, sans-serif" }}
+              >
+                Learn More
+              </Link>
             </div>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Trusted By Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center">
+            <p className="text-gray-500 text-sm font-medium mb-8">Trusted by</p>
+            <div className="flex flex-wrap justify-center items-center gap-8 opacity-60">
+              <div className="text-gray-400 font-semibold text-lg">Outreach</div>
+              <div className="text-gray-400 font-semibold text-lg">Framer</div>
+              <div className="text-gray-400 font-semibold text-lg">attentive</div>
+              <div className="text-gray-400 font-semibold text-lg">slack</div>
+              <div className="text-gray-400 font-semibold text-lg">Pipedrive</div>
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   );
 };

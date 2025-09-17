@@ -43,6 +43,10 @@ contract PolyBet is Ownable {
     uint256 public s_ethCollateral;
     uint256 public s_lpTradingRevenue;
 
+    // Liquidity tracking for decentralized liquidity
+    mapping(address => uint256) public liquidityContributions;
+    uint256 public totalLiquidityProvided;
+
     PolyBetToken public immutable i_yesToken;
     PolyBetToken public immutable i_noToken;
     PolyBetToken public s_winningToken;
@@ -195,10 +199,14 @@ contract PolyBet is Ownable {
     /// Functions ///
     /////////////////
 
-    function addLiquidity() external payable predictionNotReported onlyOwner marketActive {
+    function addLiquidity() external payable predictionNotReported marketActive {
         //// Checkpoint 4 ////
 
         s_ethCollateral += msg.value;
+
+        // Track individual liquidity contributions
+        liquidityContributions[msg.sender] += msg.value;
+        totalLiquidityProvided += msg.value;
 
         uint256 tokensAmount = (msg.value * PRECISION) / i_initialTokenValue;
 
@@ -208,8 +216,19 @@ contract PolyBet is Ownable {
         emit LiquidityAdded(msg.sender, msg.value, tokensAmount);
     }
 
-    function removeLiquidity(uint256 _ethToWithdraw) external predictionNotReported onlyOwner marketActive {
+    function removeLiquidity(uint256 _ethToWithdraw) external predictionNotReported marketActive {
         //// Checkpoint 4 ////
+
+        // Check if user has sufficient liquidity contribution
+        if (_ethToWithdraw > liquidityContributions[msg.sender]) {
+            revert PolyBet__InsufficientBalance(_ethToWithdraw, liquidityContributions[msg.sender]);
+        }
+
+        // Check if there's enough ETH collateral to withdraw
+        if (_ethToWithdraw > s_ethCollateral) {
+            revert PolyBet__InsufficientLiquidity();
+        }
+
         uint256 amountTokenToBurn = (_ethToWithdraw / i_initialTokenValue) * PRECISION;
 
         if (amountTokenToBurn > (i_yesToken.balanceOf(address(this)))) {
@@ -220,6 +239,9 @@ contract PolyBet is Ownable {
             revert PolyBet__InsufficientTokenReserve(Outcome.NO, amountTokenToBurn);
         }
 
+        // Update tracking
+        liquidityContributions[msg.sender] -= _ethToWithdraw;
+        totalLiquidityProvided -= _ethToWithdraw;
         s_ethCollateral -= _ethToWithdraw;
 
         i_yesToken.burn(address(this), amountTokenToBurn);
@@ -559,5 +581,14 @@ contract PolyBet is Ownable {
         bool canTradeNow = s_status == MarketStatus.Active && !expired;
 
         return (s_status, expired, remaining, canTradeNow);
+    }
+
+    /**
+     * @notice Get liquidity information for a user
+     */
+    function getUserLiquidityInfo(
+        address _user
+    ) external view returns (uint256 userContribution, uint256 totalLiquidity, bool hasContribution) {
+        return (liquidityContributions[_user], totalLiquidityProvided, liquidityContributions[_user] > 0);
     }
 }

@@ -1,0 +1,142 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  description String?
+  icon        String?  // Icon name or URL
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  markets Market[]
+
+  @@map("categories")
+}
+
+model Market {
+  id                String      @id @default(cuid())
+  address           String      @unique // Smart contract address
+  question          String
+  description       String?
+  categoryId        String
+  creatorAddress    String
+  oracleAddress     String
+  initialTokenValue String      // Stored as string to preserve precision
+  initialYesProbability Int
+  percentageToLock  Int
+  expirationTime    DateTime
+  initialLiquidity  String      // Stored as string to preserve precision
+  
+  // Market status
+  status            MarketStatus @default(ACTIVE)
+  isReported        Boolean     @default(false)
+  winningOutcome    Outcome?
+  resolvedAt        DateTime?
+  
+  // Statistics
+  totalVolume       String      @default("0") // Total trading volume
+  totalParticipants Int         @default(0)
+  yesTokenPrice     String?     // Current YES token price
+  noTokenPrice      String?     // Current NO token price
+  
+  // Timestamps
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+
+  // Relations
+  category          Category    @relation(fields: [categoryId], references: [id])
+  trades            Trade[]
+  liquidityEvents   LiquidityEvent[]
+
+  @@map("markets")
+}
+
+model Trade {
+  id            String    @id @default(cuid())
+  marketId      String
+  userAddress   String
+  outcome       Outcome
+  amount        String    // Token amount
+  price         String    // ETH price paid
+  tradeType     TradeType // BUY or SELL
+  txHash        String?   // Transaction hash
+  blockNumber   BigInt?
+  
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  market        Market    @relation(fields: [marketId], references: [id])
+
+  @@map("trades")
+}
+
+model LiquidityEvent {
+  id            String    @id @default(cuid())
+  marketId      String
+  userAddress   String
+  eventType     LiquidityEventType // ADD or REMOVE
+  amount        String    // ETH amount
+  tokenAmount   String    // Token amount
+  txHash        String?   // Transaction hash
+  blockNumber   BigInt?
+  
+  createdAt     DateTime  @default(now())
+
+  // Relations
+  market        Market    @relation(fields: [marketId], references: [id])
+
+  @@map("liquidity_events")
+}
+
+model User {
+  id              String    @id @default(cuid())
+  address         String    @unique
+  username        String?
+  email           String?
+  avatar          String?
+  
+  // Statistics
+  totalMarketsCreated Int   @default(0)
+  totalVolumeTraded   String @default("0")
+  totalLiquidityProvided String @default("0")
+  
+  // Timestamps
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@map("users")
+}
+
+// Enums
+enum MarketStatus {
+  ACTIVE
+  REPORTED
+  RESOLVED
+  EXPIRED
+}
+
+enum Outcome {
+  YES
+  NO
+}
+
+enum TradeType {
+  BUY
+  SELL
+}
+
+enum LiquidityEventType {
+  ADD
+  REMOVE
+}
