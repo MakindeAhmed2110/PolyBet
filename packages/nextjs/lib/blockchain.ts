@@ -1,13 +1,13 @@
 import { createPublicClient, decodeEventLog, http, parseAbiItem } from "viem";
-import { hardhat } from "viem/chains";
+import { hardhat, somniaTestnet } from "viem/chains";
 
-// ABI for the MarketCreated event from PolyBetFactory
+// ABI for the MarketCreated event from PolyBet
 const MARKET_CREATED_ABI = parseAbiItem(
-  "event MarketCreated(address indexed marketAddress, address indexed creator, string question, string category, uint256 initialLiquidity, uint256 creationTimestamp)",
+  "event MarketCreated(uint256 indexed marketAddress, address indexed creator, string question, string category, uint256 initialLiquidity)",
 );
 
 const publicClient = createPublicClient({
-  chain: hardhat,
+  chain: somniaTestnet,
   transport: http(),
 });
 
@@ -42,7 +42,7 @@ export async function getMarketAddressFromTxHash(txHash: string): Promise<string
         topics: marketCreatedLog.topics,
       });
 
-      return decoded.args.marketAddress as string;
+      return decoded.args.marketAddress.toString();
     }
 
     return null;
@@ -54,10 +54,10 @@ export async function getMarketAddressFromTxHash(txHash: string): Promise<string
 
 export async function waitForTransactionAndGetMarketAddress(txHash: string): Promise<string | null> {
   try {
-    // // Wait for the transaction to be mined
-    // await publicClient.waitForTransactionReceipt({
-    //   hash: txHash as `0x${string}`,
-    // });
+    // Wait for the transaction to be mined
+    await publicClient.waitForTransactionReceipt({
+      hash: txHash as `0x${string}`,
+    });
 
     // Get the market address from the transaction
     return await getMarketAddressFromTxHash(txHash);

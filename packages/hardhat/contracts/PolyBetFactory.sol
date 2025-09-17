@@ -22,6 +22,7 @@ contract PolyBetFactory {
 
     address public immutable i_oracle;
     address public immutable i_registry;
+    address public immutable i_polyBet;
     uint256 public s_marketCount;
 
     // Market categories
@@ -32,7 +33,7 @@ contract PolyBetFactory {
     /////////////////////////
 
     event MarketCreated(
-        address indexed marketAddress,
+        uint256 indexed marketAddress,
         address indexed creator,
         string question,
         string category,
@@ -82,9 +83,10 @@ contract PolyBetFactory {
     ////Constructor///
     //////////////////
 
-    constructor(address _oracle, address _registry) {
+    constructor(address _oracle, address _registry, address _polyBet) {
         i_oracle = _oracle;
         i_registry = _registry;
+        i_polyBet = _polyBet;
 
         // Initialize default categories
         s_categories.push("crypto");
@@ -121,17 +123,15 @@ contract PolyBetFactory {
         validQuestion(_question)
         validCategory(_category)
         validParameters(_initialTokenValue, _initialYesProbability, _percentageToLock, msg.value)
-        returns (address marketAddress)
+        returns (uint256 marketAddress)
     {
         // Validate expiration time
         if (_expirationTime <= block.timestamp + 1 hours) {
             revert PolyBetFactory__InvalidExpirationTime();
         }
 
-        // Deploy new prediction market
-        PolyBet newMarket = new PolyBet{ value: msg.value }(
-            msg.sender, // liquidity provider
-            i_oracle, // fixed oracle
+        // Create market in the main PolyBet contract
+        marketAddress = PolyBet(i_polyBet).createMarket{ value: msg.value }(
             _question,
             _category,
             _initialTokenValue,
@@ -140,7 +140,6 @@ contract PolyBetFactory {
             _expirationTime
         );
 
-        marketAddress = address(newMarket);
         s_marketCount++;
 
         // Register market in registry
@@ -198,8 +197,8 @@ contract PolyBetFactory {
     function getFactoryInfo()
         external
         view
-        returns (address oracle, address registry, uint256 marketCount, string[] memory categories)
+        returns (address oracle, address registry, address polyBet, uint256 marketCount, string[] memory categories)
     {
-        return (i_oracle, i_registry, s_marketCount, s_categories);
+        return (i_oracle, i_registry, i_polyBet, s_marketCount, s_categories);
     }
 }

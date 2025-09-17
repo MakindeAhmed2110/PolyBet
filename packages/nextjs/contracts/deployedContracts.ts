@@ -5,9 +5,9 @@
 import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 
 const deployedContracts = {
-  31337: {
-    PolyBetFactory: {
-      address: "0xc351628EB244ec633d5f21fBD6621e1a683B1181",
+  50312: {
+    PolyBet: {
+      address: "0x02308D513dA8e27adED9d40EFa0FA5f16c4e0a55",
       abi: [
         {
           inputs: [
@@ -19,6 +19,1235 @@ const deployedContracts = {
             {
               internalType: "address",
               name: "_registry",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+          ],
+          name: "OwnableInvalidOwner",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "OwnableUnauthorizedAccount",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__AmountMustBeGreaterThanZero",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__ETHTransferFailed",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_tradingAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_allowance",
+              type: "uint256",
+            },
+          ],
+          name: "PolyBet__InsufficientAllowance",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_tradingAmount",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_userBalance",
+              type: "uint256",
+            },
+          ],
+          name: "PolyBet__InsufficientBalance",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__InsufficientLiquidity",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "enum PolyBet.Outcome",
+              name: "_outcome",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "_amountToken",
+              type: "uint256",
+            },
+          ],
+          name: "PolyBet__InsufficientTokenReserve",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__InsufficientWinningTokens",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__InvalidMarketId",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__InvalidPercentageToLock",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__InvalidProbability",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__MarketExpired",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__MarketNotActive",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__MarketNotFound",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__MustProvideETHForInitialLiquidity",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__MustSendExactETHAmount",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__OnlyOracleCanReport",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__OwnerCannotCall",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__PredictionAlreadyReported",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__PredictionNotReported",
+          type: "error",
+        },
+        {
+          inputs: [],
+          name: "PolyBet__TokenTransferFailed",
+          type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "provider",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "ethAmount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "tokensAmount",
+              type: "uint256",
+            },
+          ],
+          name: "LiquidityAdded",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "provider",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "ethAmount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "tokensAmount",
+              type: "uint256",
+            },
+          ],
+          name: "LiquidityRemoved",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "creator",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "question",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "category",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "initialLiquidity",
+              type: "uint256",
+            },
+          ],
+          name: "MarketCreated",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "expirationTime",
+              type: "uint256",
+            },
+          ],
+          name: "MarketExpired",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "oracle",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "enum PolyBet.Outcome",
+              name: "winningOutcome",
+              type: "uint8",
+            },
+          ],
+          name: "MarketReported",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "resolver",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "totalEthToSend",
+              type: "uint256",
+            },
+          ],
+          name: "MarketResolved",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "previousOwner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "OwnershipTransferred",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "buyer",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "enum PolyBet.Outcome",
+              name: "outcome",
+              type: "uint8",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "ethAmount",
+              type: "uint256",
+            },
+          ],
+          name: "TokensPurchased",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "seller",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "enum PolyBet.Outcome",
+              name: "outcome",
+              type: "uint8",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "ethAmount",
+              type: "uint256",
+            },
+          ],
+          name: "TokensSold",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "redeemer",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "amount",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "ethAmount",
+              type: "uint256",
+            },
+          ],
+          name: "WinningTokensRedeemed",
+          type: "event",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+          ],
+          name: "addLiquidity",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "enum PolyBet.Outcome",
+              name: "_outcome",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "_amountTokenToBuy",
+              type: "uint256",
+            },
+          ],
+          name: "buyTokensWithETH",
+          outputs: [],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "categoryMarkets",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_question",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_category",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "_initialTokenValue",
+              type: "uint256",
+            },
+            {
+              internalType: "uint8",
+              name: "_initialYesProbability",
+              type: "uint8",
+            },
+            {
+              internalType: "uint8",
+              name: "_percentageToLock",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "_expirationTime",
+              type: "uint256",
+            },
+          ],
+          name: "createMarket",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+          ],
+          name: "expireMarket",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "enum PolyBet.Outcome",
+              name: "_outcome",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "_tradingAmount",
+              type: "uint256",
+            },
+          ],
+          name: "getBuyPriceInEth",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_category",
+              type: "string",
+            },
+          ],
+          name: "getCategoryMarkets",
+          outputs: [
+            {
+              internalType: "uint256[]",
+              name: "",
+              type: "uint256[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getMarketCount",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+          ],
+          name: "getMarketStatus",
+          outputs: [
+            {
+              internalType: "enum PolyBet.MarketStatus",
+              name: "status",
+              type: "uint8",
+            },
+            {
+              internalType: "bool",
+              name: "isExpired",
+              type: "bool",
+            },
+            {
+              internalType: "uint256",
+              name: "timeRemaining",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "canTrade",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+          ],
+          name: "getPrediction",
+          outputs: [
+            {
+              internalType: "string",
+              name: "question",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "category",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "oracle",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "initialTokenValue",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "yesTokenReserve",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "noTokenReserve",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "isReported",
+              type: "bool",
+            },
+            {
+              internalType: "uint8",
+              name: "winningOutcome",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "ethCollateral",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "lpTradingRevenue",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "creator",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "initialProbability",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "percentageLocked",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "expirationTime",
+              type: "uint256",
+            },
+            {
+              internalType: "enum PolyBet.MarketStatus",
+              name: "status",
+              type: "uint8",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "enum PolyBet.Outcome",
+              name: "_outcome",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "_tradingAmount",
+              type: "uint256",
+            },
+          ],
+          name: "getSellPriceInEth",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_user",
+              type: "address",
+            },
+          ],
+          name: "getUserBalance",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "yesTokens",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "noTokens",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "_user",
+              type: "address",
+            },
+          ],
+          name: "getUserLiquidityInfo",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "userContribution",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "totalLiquidity",
+              type: "uint256",
+            },
+            {
+              internalType: "bool",
+              name: "hasContribution",
+              type: "bool",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_user",
+              type: "address",
+            },
+          ],
+          name: "getUserMarkets",
+          outputs: [
+            {
+              internalType: "uint256[]",
+              name: "",
+              type: "uint256[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "i_oracle",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "i_registry",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "liquidityContributions",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "contribution",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "totalLiquidity",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "marketCount",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "markets",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "creator",
+              type: "address",
+            },
+            {
+              internalType: "string",
+              name: "question",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "category",
+              type: "string",
+            },
+            {
+              internalType: "uint256",
+              name: "initialTokenValue",
+              type: "uint256",
+            },
+            {
+              internalType: "uint8",
+              name: "initialYesProbability",
+              type: "uint8",
+            },
+            {
+              internalType: "uint8",
+              name: "percentageLocked",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "expirationTime",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "ethCollateral",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "yesTokenSupply",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "noTokenSupply",
+              type: "uint256",
+            },
+            {
+              internalType: "enum PolyBet.MarketStatus",
+              name: "status",
+              type: "uint8",
+            },
+            {
+              internalType: "bool",
+              name: "isReported",
+              type: "bool",
+            },
+            {
+              internalType: "uint8",
+              name: "winningOutcome",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "lpTradingRevenue",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_amount",
+              type: "uint256",
+            },
+          ],
+          name: "redeemWinningTokens",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "_ethToWithdraw",
+              type: "uint256",
+            },
+          ],
+          name: "removeLiquidity",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "renounceOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "enum PolyBet.Outcome",
+              name: "_winningOutcome",
+              type: "uint8",
+            },
+          ],
+          name: "report",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+          ],
+          name: "resolveMarketAndWithdraw",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "ethRedeemed",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+            {
+              internalType: "enum PolyBet.Outcome",
+              name: "_outcome",
+              type: "uint8",
+            },
+            {
+              internalType: "uint256",
+              name: "_tradingAmount",
+              type: "uint256",
+            },
+          ],
+          name: "sellTokensForEth",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "transferOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "userBalances",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "yesTokens",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "noTokens",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "userMarkets",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {
+        owner: "@openzeppelin/contracts/access/Ownable.sol",
+        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+      },
+    },
+    PolyBetFactory: {
+      address: "0x05F6c099A0899830396D6b94b03A8a2EebB8Ef98",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_oracle",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_registry",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_polyBet",
               type: "address",
             },
           ],
@@ -73,9 +1302,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "address",
+              internalType: "uint256",
               name: "marketAddress",
-              type: "address",
+              type: "uint256",
             },
             {
               indexed: true,
@@ -160,9 +1389,9 @@ const deployedContracts = {
           name: "createMarket",
           outputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "marketAddress",
-              type: "address",
+              type: "uint256",
             },
           ],
           stateMutability: "payable",
@@ -209,6 +1438,11 @@ const deployedContracts = {
               type: "address",
             },
             {
+              internalType: "address",
+              name: "polyBet",
+              type: "address",
+            },
+            {
               internalType: "uint256",
               name: "marketCount",
               type: "uint256",
@@ -238,6 +1472,19 @@ const deployedContracts = {
         {
           inputs: [],
           name: "i_oracle",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "i_polyBet",
           outputs: [
             {
               internalType: "address",
@@ -297,7 +1544,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     PolyBetRegistry: {
-      address: "0x7bc06c482DEAd17c0e297aFbC32f6e63d3846650",
+      address: "0xbfaA6EaBFD3891532fFd7C2aD4252f579935dC93",
       abi: [
         {
           inputs: [
@@ -343,9 +1590,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "address",
+              internalType: "uint256",
               name: "marketAddress",
-              type: "address",
+              type: "uint256",
             },
             {
               indexed: true,
@@ -380,9 +1627,9 @@ const deployedContracts = {
           inputs: [
             {
               indexed: true,
-              internalType: "address",
+              internalType: "uint256",
               name: "marketAddress",
-              type: "address",
+              type: "uint256",
             },
             {
               indexed: false,
@@ -399,9 +1646,9 @@ const deployedContracts = {
           name: "getAllMarkets",
           outputs: [
             {
-              internalType: "address[]",
+              internalType: "uint256[]",
               name: "",
-              type: "address[]",
+              type: "uint256[]",
             },
           ],
           stateMutability: "view",
@@ -410,17 +1657,17 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "_marketAddress",
-              type: "address",
+              type: "uint256",
             },
           ],
           name: "getMarketInfo",
           outputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "marketAddress",
-              type: "address",
+              type: "uint256",
             },
             {
               internalType: "address",
@@ -462,9 +1709,9 @@ const deployedContracts = {
           name: "getMarketsByCategory",
           outputs: [
             {
-              internalType: "address[]",
+              internalType: "uint256[]",
               name: "",
-              type: "address[]",
+              type: "uint256[]",
             },
           ],
           stateMutability: "view",
@@ -481,9 +1728,9 @@ const deployedContracts = {
           name: "getMarketsByCreator",
           outputs: [
             {
-              internalType: "address[]",
+              internalType: "uint256[]",
               name: "",
-              type: "address[]",
+              type: "uint256[]",
             },
           ],
           stateMutability: "view",
@@ -505,9 +1752,9 @@ const deployedContracts = {
           name: "getMarketsPaginated",
           outputs: [
             {
-              internalType: "address[]",
+              internalType: "uint256[]",
               name: "markets",
-              type: "address[]",
+              type: "uint256[]",
             },
             {
               internalType: "uint256",
@@ -557,9 +1804,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "_marketAddress",
-              type: "address",
+              type: "uint256",
             },
             {
               internalType: "address",
@@ -598,9 +1845,9 @@ const deployedContracts = {
           name: "s_allMarkets",
           outputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "",
-              type: "address",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -622,9 +1869,9 @@ const deployedContracts = {
           name: "s_categoryMarkets",
           outputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "",
-              type: "address",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -646,9 +1893,9 @@ const deployedContracts = {
           name: "s_creatorMarkets",
           outputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "",
-              type: "address",
+              type: "uint256",
             },
           ],
           stateMutability: "view",
@@ -657,17 +1904,17 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "",
-              type: "address",
+              type: "uint256",
             },
           ],
           name: "s_markets",
           outputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "marketAddress",
-              type: "address",
+              type: "uint256",
             },
             {
               internalType: "address",
@@ -727,9 +1974,9 @@ const deployedContracts = {
         {
           inputs: [
             {
-              internalType: "address",
+              internalType: "uint256",
               name: "_marketAddress",
-              type: "address",
+              type: "uint256",
             },
             {
               internalType: "bool",
@@ -744,450 +1991,6 @@ const deployedContracts = {
         },
       ],
       inheritedFunctions: {},
-    },
-  },
-  50312: {
-    PolyBetFactory: {
-      address: "0xa59ca7dD500f8C70f4A3F2166D30E03D0f42F460",
-      abi: [
-        {
-          inputs: [],
-          stateMutability: "nonpayable",
-          type: "constructor",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "owner",
-              type: "address",
-            },
-          ],
-          name: "OwnableInvalidOwner",
-          type: "error",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "account",
-              type: "address",
-            },
-          ],
-          name: "OwnableUnauthorizedAccount",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PolyBetFactory__InvalidParameters",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PolyBetFactory__MarketAlreadyExists",
-          type: "error",
-        },
-        {
-          inputs: [],
-          name: "PolyBetFactory__MarketNotFound",
-          type: "error",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "uint256",
-              name: "marketId",
-              type: "uint256",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "marketAddress",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "string",
-              name: "question",
-              type: "string",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "creator",
-              type: "address",
-            },
-            {
-              indexed: false,
-              internalType: "address",
-              name: "oracle",
-              type: "address",
-            },
-          ],
-          name: "MarketCreated",
-          type: "event",
-        },
-        {
-          anonymous: false,
-          inputs: [
-            {
-              indexed: true,
-              internalType: "address",
-              name: "previousOwner",
-              type: "address",
-            },
-            {
-              indexed: true,
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "OwnershipTransferred",
-          type: "event",
-        },
-        {
-          inputs: [],
-          name: "MAX_MARKETS",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "string",
-              name: "_question",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "_oracle",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "_initialTokenValue",
-              type: "uint256",
-            },
-            {
-              internalType: "uint8",
-              name: "_initialYesProbability",
-              type: "uint8",
-            },
-            {
-              internalType: "uint8",
-              name: "_percentageToLock",
-              type: "uint8",
-            },
-          ],
-          name: "createMarket",
-          outputs: [
-            {
-              internalType: "address",
-              name: "marketAddress",
-              type: "address",
-            },
-          ],
-          stateMutability: "payable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_marketId",
-              type: "uint256",
-            },
-          ],
-          name: "deactivateMarket",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "getAllMarkets",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "address",
-                  name: "marketAddress",
-                  type: "address",
-                },
-                {
-                  internalType: "string",
-                  name: "question",
-                  type: "string",
-                },
-                {
-                  internalType: "address",
-                  name: "creator",
-                  type: "address",
-                },
-                {
-                  internalType: "address",
-                  name: "oracle",
-                  type: "address",
-                },
-                {
-                  internalType: "uint256",
-                  name: "createdAt",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "isActive",
-                  type: "bool",
-                },
-              ],
-              internalType: "struct PolyBetFactory.MarketInfo[]",
-              name: "",
-              type: "tuple[]",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "_marketId",
-              type: "uint256",
-            },
-          ],
-          name: "getMarket",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "address",
-                  name: "marketAddress",
-                  type: "address",
-                },
-                {
-                  internalType: "string",
-                  name: "question",
-                  type: "string",
-                },
-                {
-                  internalType: "address",
-                  name: "creator",
-                  type: "address",
-                },
-                {
-                  internalType: "address",
-                  name: "oracle",
-                  type: "address",
-                },
-                {
-                  internalType: "uint256",
-                  name: "createdAt",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "isActive",
-                  type: "bool",
-                },
-              ],
-              internalType: "struct PolyBetFactory.MarketInfo",
-              name: "",
-              type: "tuple",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "getMarketCount",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_creator",
-              type: "address",
-            },
-          ],
-          name: "getMarketsByCreator",
-          outputs: [
-            {
-              components: [
-                {
-                  internalType: "address",
-                  name: "marketAddress",
-                  type: "address",
-                },
-                {
-                  internalType: "string",
-                  name: "question",
-                  type: "string",
-                },
-                {
-                  internalType: "address",
-                  name: "creator",
-                  type: "address",
-                },
-                {
-                  internalType: "address",
-                  name: "oracle",
-                  type: "address",
-                },
-                {
-                  internalType: "uint256",
-                  name: "createdAt",
-                  type: "uint256",
-                },
-                {
-                  internalType: "bool",
-                  name: "isActive",
-                  type: "bool",
-                },
-              ],
-              internalType: "struct PolyBetFactory.MarketInfo[]",
-              name: "",
-              type: "tuple[]",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          name: "isMarket",
-          outputs: [
-            {
-              internalType: "bool",
-              name: "",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "marketCount",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "markets",
-          outputs: [
-            {
-              internalType: "address",
-              name: "marketAddress",
-              type: "address",
-            },
-            {
-              internalType: "string",
-              name: "question",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "creator",
-              type: "address",
-            },
-            {
-              internalType: "address",
-              name: "oracle",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "createdAt",
-              type: "uint256",
-            },
-            {
-              internalType: "bool",
-              name: "isActive",
-              type: "bool",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "owner",
-          outputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
-        {
-          inputs: [],
-          name: "renounceOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "newOwner",
-              type: "address",
-            },
-          ],
-          name: "transferOwnership",
-          outputs: [],
-          stateMutability: "nonpayable",
-          type: "function",
-        },
-      ],
-      inheritedFunctions: {
-        owner: "@openzeppelin/contracts/access/Ownable.sol",
-        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
-      },
     },
   },
   11155111: {

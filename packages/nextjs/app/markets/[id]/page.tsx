@@ -6,224 +6,10 @@ import { useParams, useRouter } from "next/navigation";
 import type { NextPage } from "next";
 import { formatEther, parseEther } from "viem";
 import { useAccount, usePublicClient, useReadContract, useWriteContract } from "wagmi";
+import deployedContracts from "~~/contracts/deployedContracts";
 
-// ABI for PolyBet contract functions
-const POLYBET_ABI = [
-  {
-    inputs: [
-      {
-        internalType: "enum PolyBet.Outcome",
-        name: "_outcome",
-        type: "uint8",
-      },
-      {
-        internalType: "uint256",
-        name: "_amountTokenToBuy",
-        type: "uint256",
-      },
-    ],
-    name: "buyTokensWithETH",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "enum PolyBet.Outcome",
-        name: "_outcome",
-        type: "uint8",
-      },
-      {
-        internalType: "uint256",
-        name: "_tradingAmount",
-        type: "uint256",
-      },
-    ],
-    name: "sellTokensForEth",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "enum PolyBet.Outcome",
-        name: "_outcome",
-        type: "uint8",
-      },
-      {
-        internalType: "uint256",
-        name: "_tradingAmount",
-        type: "uint256",
-      },
-    ],
-    name: "getBuyPriceInEth",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "getPrediction",
-    outputs: [
-      {
-        internalType: "string",
-        name: "question",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "outcome1",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "outcome2",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "oracle",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "initialTokenValue",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "yesTokenReserve",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "noTokenReserve",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "isReported",
-        type: "bool",
-      },
-      {
-        internalType: "address",
-        name: "yesToken",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "noToken",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "winningToken",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "ethCollateral",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "lpTradingRevenue",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "predictionMarketOwner",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "initialProbability",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "percentageLocked",
-        type: "uint256",
-      },
-      {
-        internalType: "string",
-        name: "category",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "creator",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "expirationTime",
-        type: "uint256",
-      },
-      {
-        internalType: "enum PolyBet.MarketStatus",
-        name: "status",
-        type: "uint8",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  // ERC20 balanceOf function
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "account",
-        type: "address",
-      },
-    ],
-    name: "balanceOf",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "resolveMarketAndWithdraw",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "ethRedeemed",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_amount",
-        type: "uint256",
-      },
-    ],
-    name: "redeemWinningTokens",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-] as const;
+// Get the PolyBet contract ABI from deployed contracts
+const POLYBET_ABI = deployedContracts[50312].PolyBet.abi;
 
 const MarketDetail: NextPage = () => {
   const params = useParams();
@@ -241,11 +27,35 @@ const MarketDetail: NextPage = () => {
   const publicClient = usePublicClient();
 
   // Read market data from the contract
-  const { data: marketData, isLoading: marketLoading } = useReadContract({
-    address: marketAddress as `0x${string}`,
+  const {
+    data: marketData,
+    isLoading: marketLoading,
+    error: marketError,
+  } = useReadContract({
+    address: deployedContracts[50312].PolyBet.address as `0x${string}`,
     abi: POLYBET_ABI,
     functionName: "getPrediction",
+    args: [BigInt(marketAddress)], // marketAddress is now the market ID
   });
+
+  // Debug: Log the error if it exists
+  if (marketError) {
+    console.error("Market data error:", marketError);
+  }
+
+  // Check market count to see if market exists
+  const { data: marketCount } = useReadContract({
+    address: deployedContracts[50312].PolyBet.address as `0x${string}`,
+    abi: POLYBET_ABI,
+    functionName: "marketCount",
+  });
+
+  // Debug: Log market count and current market ID
+  if (marketCount !== undefined) {
+    console.log("Total markets:", marketCount);
+    console.log("Current market ID:", marketAddress);
+    console.log("Market exists:", BigInt(marketAddress) < marketCount);
+  }
 
   // State for real-time probabilities
   const [yesProbability, setYesProbability] = useState(50);
@@ -257,39 +67,31 @@ const MarketDetail: NextPage = () => {
 
   // Fetch user token balances
   const fetchUserBalances = useCallback(async () => {
-    if (!address || !marketData || !publicClient) {
+    if (!address || !marketAddress || !publicClient) {
       setUserYesBalance("0");
       setUserNoBalance("0");
       return;
     }
 
     try {
-      const yesTokenAddress = marketData[8] as string;
-      const noTokenAddress = marketData[9] as string;
+      const userBalance = await publicClient.readContract({
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
+        abi: POLYBET_ABI,
+        functionName: "getUserBalance",
+        args: [BigInt(marketAddress), address],
+      });
 
-      const [yesBalance, noBalance] = await Promise.all([
-        publicClient.readContract({
-          address: yesTokenAddress as `0x${string}`,
-          abi: POLYBET_ABI,
-          functionName: "balanceOf",
-          args: [address],
-        }),
-        publicClient.readContract({
-          address: noTokenAddress as `0x${string}`,
-          abi: POLYBET_ABI,
-          functionName: "balanceOf",
-          args: [address],
-        }),
-      ]);
-
-      setUserYesBalance(formatEther(yesBalance as bigint));
-      setUserNoBalance(formatEther(noBalance as bigint));
+      // getUserBalance returns a tuple with yesTokens and noTokens
+      setUserYesBalance(formatEther(userBalance[0] as bigint));
+      setUserNoBalance(formatEther(userBalance[1] as bigint));
     } catch (error) {
       console.error("Error fetching user balances:", error);
+      console.error("Market ID:", marketAddress);
+      console.error("User address:", address);
       setUserYesBalance("0");
       setUserNoBalance("0");
     }
-  }, [address, marketData, publicClient]);
+  }, [address, marketAddress, publicClient]);
 
   // Calculate current probabilities based on tokens sold (not reserves)
   const calculateProbabilities = async () => {
@@ -301,9 +103,9 @@ const MarketDetail: NextPage = () => {
 
     try {
       // Get current token reserves
-      const yesReserve = Number(marketData[5]); // yesTokenReserve
-      const noReserve = Number(marketData[6]); // noTokenReserve
-      //const initialTokenValue = Number(marketData[4]); // initialTokenValue
+      const yesReserve = Number(marketData[4]); // yesTokenReserve (index 4)
+      const noReserve = Number(marketData[5]); // noTokenReserve (index 5)
+      //const initialTokenValue = Number(marketData[3]); // initialTokenValue (index 3)
 
       // Calculate total supply (this should be the same for both tokens)
       const totalSupply = yesReserve + noReserve;
@@ -321,7 +123,7 @@ const MarketDetail: NextPage = () => {
 
       if (totalTokensSold === 0) {
         // If no tokens have been sold yet, use initial probability
-        const initialYesProb = Number(marketData[14]); // initialProbability
+        const initialYesProb = Number(marketData[11]); // initialProbability (index 11)
         setYesProbability(initialYesProb);
         setNoProbability(100 - initialYesProb);
         return;
@@ -358,14 +160,15 @@ const MarketDetail: NextPage = () => {
       try {
         // Refetch market data to get updated reserves
         const updatedData = await publicClient.readContract({
-          address: marketAddress as `0x${string}`,
+          address: deployedContracts[50312].PolyBet.address as `0x${string}`,
           abi: POLYBET_ABI,
           functionName: "getPrediction",
+          args: [BigInt(marketAddress)], // marketAddress is now the market ID
         });
 
         // Update the probabilities with fresh data
-        const yesReserve = Number(updatedData[5]);
-        const noReserve = Number(updatedData[6]);
+        const yesReserve = Number(updatedData[4]); // yesTokenReserve (index 4)
+        const noReserve = Number(updatedData[5]); // noTokenReserve (index 5)
         const totalSupply = yesReserve + noReserve;
 
         if (totalSupply === 0) {
@@ -379,7 +182,7 @@ const MarketDetail: NextPage = () => {
         const totalTokensSold = yesTokensSold + noTokensSold;
 
         if (totalTokensSold === 0) {
-          const initialYesProb = Number(updatedData[14]);
+          const initialYesProb = Number(updatedData[11]); // initialProbability (index 11)
           setYesProbability(initialYesProb);
           setNoProbability(100 - initialYesProb);
           return;
@@ -412,10 +215,10 @@ const MarketDetail: NextPage = () => {
 
         // Call getBuyPriceInEth to get the exact ETH amount needed
         const price = await publicClient.readContract({
-          address: marketAddress as `0x${string}`,
+          address: deployedContracts[50312].PolyBet.address as `0x${string}`,
           abi: POLYBET_ABI,
           functionName: "getBuyPriceInEth",
-          args: [outcome, tokenAmount],
+          args: [BigInt(marketAddress), outcome, tokenAmount], // marketAddress is now the market ID
         });
 
         setEthPrice(formatEther(price as bigint));
@@ -457,12 +260,12 @@ const MarketDetail: NextPage = () => {
       const tokenAmountWei = parseEther(amount);
       const ethAmountWei = parseEther(ethPrice);
 
-      // Call the buyTokensWithETH function on the market contract
+      // Call the buyTokensWithETH function on the PolyBet contract
       await writeContractAsync({
-        address: marketAddress as `0x${string}`,
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
         abi: POLYBET_ABI,
         functionName: "buyTokensWithETH",
-        args: [outcome, tokenAmountWei],
+        args: [BigInt(marketAddress), outcome, tokenAmountWei], // marketAddress is now the market ID
         value: ethAmountWei, // Use the calculated ETH price
       });
 
@@ -507,9 +310,10 @@ const MarketDetail: NextPage = () => {
     try {
       // Call the resolveMarketAndWithdraw function
       const result = await writeContractAsync({
-        address: marketAddress as `0x${string}`,
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
         abi: POLYBET_ABI,
         functionName: "resolveMarketAndWithdraw",
+        args: [BigInt(marketAddress)], // marketAddress is now the market ID
       });
 
       console.log("Market resolved successfully!", result);
@@ -552,8 +356,7 @@ const MarketDetail: NextPage = () => {
   const handleRedeemTokens = async () => {
     if (!address || !marketAddress) return;
 
-    const isWinningToken =
-      winningToken && yesToken && winningToken.toLowerCase() === yesToken.toLowerCase() ? "yes" : "no";
+    const isWinningToken = winningOutcome === 0 ? "yes" : "no"; // 0 = YES, 1 = NO
     const winningBalance = isWinningToken === "yes" ? userYesBalance : userNoBalance;
 
     if (parseFloat(winningBalance) <= 0) {
@@ -565,10 +368,10 @@ const MarketDetail: NextPage = () => {
     try {
       // Call the redeemWinningTokens function
       const result = await writeContractAsync({
-        address: marketAddress as `0x${string}`,
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
         abi: POLYBET_ABI,
         functionName: "redeemWinningTokens",
-        args: [parseEther(winningBalance)],
+        args: [BigInt(marketAddress), parseEther(winningBalance)], // marketAddress is now the market ID
       });
 
       console.log("Tokens redeemed successfully!", result);
@@ -620,25 +423,20 @@ const MarketDetail: NextPage = () => {
 
   // Destructure the market data tuple
   const question = marketData?.[0] as string;
-  const outcome1 = marketData?.[1] as string;
-  const outcome2 = marketData?.[2] as string;
-  const oracle = marketData?.[3] as string;
-  const initialTokenValue = marketData?.[4] as bigint;
-  const yesTokenReserve = marketData?.[5] as bigint;
-  const noTokenReserve = marketData?.[6] as bigint;
-  const isReported = marketData?.[7] as boolean;
-  const yesToken = marketData?.[8] as string;
-  const noToken = marketData?.[9] as string;
-  const winningToken = marketData?.[10] as string;
-  const ethCollateral = marketData?.[11] as bigint;
-  const lpTradingRevenue = marketData?.[12] as bigint;
-  const predictionMarketOwner = marketData?.[13] as string;
-  const initialProbability = marketData?.[14] as bigint;
-  const percentageLocked = marketData?.[15] as bigint;
-  const category = marketData?.[16] as string;
-  const creator = marketData?.[17] as string;
-  const expirationTime = marketData?.[18] as bigint;
-  const status = marketData?.[19] as number;
+  const category = marketData?.[1] as string;
+  const oracle = marketData?.[2] as string;
+  const initialTokenValue = marketData?.[3] as bigint;
+  const yesTokenReserve = marketData?.[4] as bigint;
+  const noTokenReserve = marketData?.[5] as bigint;
+  const isReported = marketData?.[6] as boolean;
+  const winningOutcome = marketData?.[7] as number;
+  const ethCollateral = marketData?.[8] as bigint;
+  const lpTradingRevenue = marketData?.[9] as bigint;
+  const creator = marketData?.[10] as string;
+  const initialProbability = marketData?.[11] as bigint;
+  const percentageLocked = marketData?.[12] as bigint;
+  const expirationTime = marketData?.[13] as bigint;
+  const status = marketData?.[14] as number;
 
   const expirationDate = expirationTime ? new Date(Number(expirationTime) * 1000).toLocaleDateString() : "N/A";
   const volume =
@@ -770,7 +568,7 @@ const MarketDetail: NextPage = () => {
                         <div className="flex justify-between text-sm">
                           <span className="text-green-700">Available:</span>
                           <span className="font-semibold text-green-900">
-                            {marketData ? formatEther(marketData[5] as bigint) : "0"} tokens
+                            {marketData ? formatEther(marketData[4] as bigint) : "0"} tokens
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
@@ -779,11 +577,7 @@ const MarketDetail: NextPage = () => {
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-green-700">Token Address:</span>
-                          <span className="font-mono text-xs text-green-600 truncate">
-                            {marketData
-                              ? (marketData[8] as string).slice(0, 10) + "..." + (marketData[8] as string).slice(-8)
-                              : "N/A"}
-                          </span>
+                          <span className="font-mono text-xs text-green-600 truncate">N/A (Virtual Tokens)</span>
                         </div>
                       </div>
                     </div>
@@ -798,7 +592,7 @@ const MarketDetail: NextPage = () => {
                         <div className="flex justify-between text-sm">
                           <span className="text-red-700">Available:</span>
                           <span className="font-semibold text-red-900">
-                            {marketData ? formatEther(marketData[6] as bigint) : "0"} tokens
+                            {marketData ? formatEther(marketData[5] as bigint) : "0"} tokens
                           </span>
                         </div>
                         <div className="flex justify-between text-sm">
@@ -807,11 +601,7 @@ const MarketDetail: NextPage = () => {
                         </div>
                         <div className="flex justify-between text-sm">
                           <span className="text-red-700">Token Address:</span>
-                          <span className="font-mono text-xs text-red-600 truncate">
-                            {marketData
-                              ? (marketData[9] as string).slice(0, 10) + "..." + (marketData[9] as string).slice(-8)
-                              : "N/A"}
-                          </span>
+                          <span className="font-mono text-xs text-red-600 truncate">N/A (Virtual Tokens)</span>
                         </div>
                       </div>
                     </div>
@@ -825,40 +615,40 @@ const MarketDetail: NextPage = () => {
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Initial Token Value:</span>
                       <span className="font-semibold text-gray-900">
-                        {marketData ? formatEther(marketData[4] as bigint) : "0"} ETH
+                        {marketData ? formatEther(marketData[3] as bigint) : "0"} ETH
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Initial Yes Probability:</span>
-                      <span className="font-semibold text-gray-900">{marketData ? Number(marketData[14]) : 0}%</span>
+                      <span className="font-semibold text-gray-900">{marketData ? Number(marketData[11]) : 0}%</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Percentage Locked:</span>
-                      <span className="font-semibold text-gray-900">{marketData ? Number(marketData[15]) : 0}%</span>
+                      <span className="font-semibold text-gray-900">{marketData ? Number(marketData[12]) : 0}%</span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">ETH Collateral:</span>
                       <span className="font-semibold text-gray-900">
-                        {marketData ? formatEther(marketData[11] as bigint) : "0"} ETH
+                        {marketData ? formatEther(marketData[8] as bigint) : "0"} ETH
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">LP Trading Revenue:</span>
                       <span className="font-semibold text-gray-900">
-                        {marketData ? formatEther(marketData[12] as bigint) : "0"} ETH
+                        {marketData ? formatEther(marketData[9] as bigint) : "0"} ETH
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Expiration:</span>
                       <span className="font-semibold text-gray-900">
-                        {marketData ? new Date(Number(marketData[18]) * 1000).toLocaleString() : "N/A"}
+                        {marketData ? new Date(Number(marketData[13]) * 1000).toLocaleString() : "N/A"}
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Creator:</span>
                       <span className="font-mono text-xs text-gray-600 truncate">
                         {marketData
-                          ? (marketData[16] as string).slice(0, 10) + "..." + (marketData[16] as string).slice(-8)
+                          ? (marketData[10] as string).slice(0, 10) + "..." + (marketData[10] as string).slice(-8)
                           : "N/A"}
                       </span>
                     </div>
@@ -866,7 +656,7 @@ const MarketDetail: NextPage = () => {
                       <span className="text-gray-600">Oracle:</span>
                       <span className="font-mono text-xs text-gray-600 truncate">
                         {marketData
-                          ? (marketData[3] as string).slice(0, 10) + "..." + (marketData[3] as string).slice(-8)
+                          ? (marketData[2] as string).slice(0, 10) + "..." + (marketData[2] as string).slice(-8)
                           : "N/A"}
                       </span>
                     </div>
@@ -1045,11 +835,7 @@ const MarketDetail: NextPage = () => {
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-gray-600">Winning Outcome:</span>
-                        <span className="font-medium text-green-600">
-                          {winningToken && yesToken && winningToken.toLowerCase() === yesToken.toLowerCase()
-                            ? "YES"
-                            : "NO"}
-                        </span>
+                        <span className="font-medium text-green-600">{winningOutcome === 0 ? "YES" : "NO"}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">ETH Collateral:</span>
@@ -1109,18 +895,13 @@ const MarketDetail: NextPage = () => {
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Winning Outcome:</span>
-                        <span className="font-medium text-green-600">
-                          {winningToken && yesToken && winningToken.toLowerCase() === yesToken.toLowerCase()
-                            ? "YES"
-                            : "NO"}
-                        </span>
+                        <span className="font-medium text-green-600">{winningOutcome === 0 ? "YES" : "NO"}</span>
                       </div>
                     </div>
                   </div>
 
                   {(() => {
-                    const isWinningToken =
-                      winningToken && yesToken && winningToken.toLowerCase() === yesToken.toLowerCase() ? "yes" : "no";
+                    const isWinningToken = winningOutcome === 0 ? "yes" : "no";
                     const winningBalance = isWinningToken === "yes" ? userYesBalance : userNoBalance;
                     const canRedeem = parseFloat(winningBalance) > 0;
 

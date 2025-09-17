@@ -3,119 +3,11 @@
 import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePublicClient } from "wagmi";
+import deployedContracts from "~~/contracts/deployedContracts";
 import { Market } from "~~/hooks/useMarkets";
 
-// ABI for getPrediction function
-const POLYBET_ABI = [
-  {
-    inputs: [],
-    name: "getPrediction",
-    outputs: [
-      {
-        internalType: "string",
-        name: "question",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "outcome1",
-        type: "string",
-      },
-      {
-        internalType: "string",
-        name: "outcome2",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "oracle",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "initialTokenValue",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "yesTokenReserve",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "noTokenReserve",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "isReported",
-        type: "bool",
-      },
-      {
-        internalType: "address",
-        name: "yesToken",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "noToken",
-        type: "address",
-      },
-      {
-        internalType: "address",
-        name: "winningToken",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "ethCollateral",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "lpTradingRevenue",
-        type: "uint256",
-      },
-      {
-        internalType: "address",
-        name: "predictionMarketOwner",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "initialProbability",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "percentageLocked",
-        type: "uint256",
-      },
-      {
-        internalType: "string",
-        name: "category",
-        type: "string",
-      },
-      {
-        internalType: "address",
-        name: "creator",
-        type: "address",
-      },
-      {
-        internalType: "uint256",
-        name: "expirationTime",
-        type: "uint256",
-      },
-      {
-        internalType: "enum PolyBet.MarketStatus",
-        name: "status",
-        type: "uint8",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const;
+// Get the PolyBet contract ABI from deployed contracts
+const POLYBET_ABI = deployedContracts[50312].PolyBet.abi;
 
 interface MarketCardProps {
   market: Market;
@@ -137,13 +29,14 @@ export function MarketCard({ market }: MarketCardProps) {
 
     try {
       const marketData = await publicClient.readContract({
-        address: market.address as `0x${string}`,
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
         abi: POLYBET_ABI,
         functionName: "getPrediction",
+        args: [BigInt(market.address)], // market.address is now the market ID
       });
 
-      const yesReserve = Number(marketData[5]); // yesTokenReserve
-      const noReserve = Number(marketData[6]); // noTokenReserve
+      const yesReserve = Number(marketData[4]); // yesTokenReserve (index 4)
+      const noReserve = Number(marketData[5]); // noTokenReserve (index 5)
       const totalSupply = yesReserve + noReserve;
 
       if (totalSupply === 0) {
@@ -159,7 +52,7 @@ export function MarketCard({ market }: MarketCardProps) {
 
       if (totalTokensSold === 0) {
         // If no tokens have been sold yet, use initial probability
-        const initialYesProb = Number(marketData[14]); // initialProbability
+        const initialYesProb = Number(marketData[11]); // initialProbability (index 11)
         setYesProbability(initialYesProb);
         setNoProbability(100 - initialYesProb);
       } else {

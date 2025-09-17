@@ -17,7 +17,7 @@ contract PolyBetRegistry {
     address public i_factory;
 
     struct MarketInfo {
-        address marketAddress;
+        uint256 marketAddress;
         address creator;
         string question;
         string category;
@@ -25,17 +25,17 @@ contract PolyBetRegistry {
         bool isActive;
     }
 
-    // Market address to market info
-    mapping(address => MarketInfo) public s_markets;
+    // Market ID to market info
+    mapping(uint256 => MarketInfo) public s_markets;
 
     // Creator address to their created markets
-    mapping(address => address[]) public s_creatorMarkets;
+    mapping(address => uint256[]) public s_creatorMarkets;
 
-    // All market addresses
-    address[] public s_allMarkets;
+    // All market IDs
+    uint256[] public s_allMarkets;
 
-    // Category to market addresses
-    mapping(string => address[]) public s_categoryMarkets;
+    // Category to market IDs
+    mapping(string => uint256[]) public s_categoryMarkets;
 
     uint256 public s_totalMarkets;
 
@@ -44,14 +44,14 @@ contract PolyBetRegistry {
     /////////////////////////
 
     event MarketRegistered(
-        address indexed marketAddress,
+        uint256 indexed marketAddress,
         address indexed creator,
         string question,
         string category,
         uint256 createdAt
     );
 
-    event MarketStatusUpdated(address indexed marketAddress, bool isActive);
+    event MarketStatusUpdated(uint256 indexed marketAddress, bool isActive);
     event FactorySet(address indexed factory);
 
     /////////////////
@@ -65,15 +65,15 @@ contract PolyBetRegistry {
         _;
     }
 
-    modifier marketExists(address _marketAddress) {
-        if (s_markets[_marketAddress].marketAddress == address(0)) {
+    modifier marketExists(uint256 _marketAddress) {
+        if (s_markets[_marketAddress].marketAddress == 0 && s_markets[_marketAddress].creator == address(0)) {
             revert PolyBetRegistry__MarketNotRegistered();
         }
         _;
     }
 
-    modifier marketNotExists(address _marketAddress) {
-        if (s_markets[_marketAddress].marketAddress != address(0)) {
+    modifier marketNotExists(uint256 _marketAddress) {
+        if (s_markets[_marketAddress].marketAddress != 0 || s_markets[_marketAddress].creator != address(0)) {
             revert PolyBetRegistry__MarketAlreadyRegistered();
         }
         _;
@@ -108,14 +108,14 @@ contract PolyBetRegistry {
 
     /**
      * @notice Register a new market (only callable by factory)
-     * @param _marketAddress The address of the market contract
+     * @param _marketAddress The ID of the market
      * @param _creator The address of the market creator
      * @param _question The prediction question
      * @param _category The market category
      * @param _createdAt The creation timestamp
      */
     function registerMarket(
-        address _marketAddress,
+        uint256 _marketAddress,
         address _creator,
         string memory _question,
         string memory _category,
@@ -143,11 +143,11 @@ contract PolyBetRegistry {
 
     /**
      * @notice Update market status (for future use - market deactivation)
-     * @param _marketAddress The market address
+     * @param _marketAddress The market ID
      * @param _isActive New active status
      */
     function updateMarketStatus(
-        address _marketAddress,
+        uint256 _marketAddress,
         bool _isActive
     ) external onlyFactory marketExists(_marketAddress) {
         s_markets[_marketAddress].isActive = _isActive;
@@ -161,15 +161,15 @@ contract PolyBetRegistry {
 
     /**
      * @notice Get market information
-     * @param _marketAddress The market address
+     * @param _marketAddress The market ID
      */
     function getMarketInfo(
-        address _marketAddress
+        uint256 _marketAddress
     )
         external
         view
         returns (
-            address marketAddress,
+            uint256 marketAddress,
             address creator,
             string memory question,
             string memory category,
@@ -191,7 +191,7 @@ contract PolyBetRegistry {
     /**
      * @notice Get all markets
      */
-    function getAllMarkets() external view returns (address[] memory) {
+    function getAllMarkets() external view returns (uint256[] memory) {
         return s_allMarkets;
     }
 
@@ -199,7 +199,7 @@ contract PolyBetRegistry {
      * @notice Get markets by creator
      * @param _creator The creator address
      */
-    function getMarketsByCreator(address _creator) external view returns (address[] memory) {
+    function getMarketsByCreator(address _creator) external view returns (uint256[] memory) {
         return s_creatorMarkets[_creator];
     }
 
@@ -207,7 +207,7 @@ contract PolyBetRegistry {
      * @notice Get markets by category
      * @param _category The category name
      */
-    function getMarketsByCategory(string memory _category) external view returns (address[] memory) {
+    function getMarketsByCategory(string memory _category) external view returns (uint256[] memory) {
         return s_categoryMarkets[_category];
     }
 
@@ -219,11 +219,11 @@ contract PolyBetRegistry {
     function getMarketsPaginated(
         uint256 _offset,
         uint256 _limit
-    ) external view returns (address[] memory markets, uint256 totalCount) {
+    ) external view returns (uint256[] memory markets, uint256 totalCount) {
         uint256 totalMarkets = s_allMarkets.length;
 
         if (_offset >= totalMarkets) {
-            return (new address[](0), totalMarkets);
+            return (new uint256[](0), totalMarkets);
         }
 
         uint256 endIndex = _offset + _limit;
@@ -232,7 +232,7 @@ contract PolyBetRegistry {
         }
 
         uint256 resultLength = endIndex - _offset;
-        address[] memory result = new address[](resultLength);
+        uint256[] memory result = new uint256[](resultLength);
 
         for (uint256 i = 0; i < resultLength; i++) {
             result[i] = s_allMarkets[_offset + i];

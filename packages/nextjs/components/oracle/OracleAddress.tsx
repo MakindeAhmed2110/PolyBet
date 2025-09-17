@@ -56,7 +56,7 @@ export function OracleAddress() {
             </div>
             <div className="text-center p-3 bg-green-50 rounded-lg">
               <p className="text-sm text-green-600 font-medium">Categories</p>
-              <p className="text-2xl font-bold text-green-900">{categories.length}</p>
+              <p className="text-2xl font-bold text-green-900">{(categories as any[]).length}</p>
             </div>
           </div>
 
@@ -64,7 +64,7 @@ export function OracleAddress() {
           <div>
             <label className="text-sm font-medium text-gray-500">Available Categories</label>
             <div className="mt-2 flex flex-wrap gap-2">
-              {categories.map((category: string, index: number) => (
+              {(categories as any[]).map((category: string, index: number) => (
                 <span key={index} className="badge badge-outline">
                   {category}
                 </span>

@@ -34,7 +34,7 @@ const CreateMarket: NextPage = () => {
 
   // Market creation hook
   const { writeContractAsync: writeFactoryAsync } = useScaffoldWriteContract({
-    contractName: "PolyBetFactory",
+    contractName: "PolyBet",
   });
 
   const handleInputChange = (field: string, value: string | number) => {
