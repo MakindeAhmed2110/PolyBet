@@ -62,11 +62,15 @@ contract PolyBet is Ownable {
     struct LiquidityInfo {
         uint256 contribution;
         uint256 totalLiquidity;
+        uint256 accumulatedRevenue; // Track LP's share of trading revenue
+        uint256 lastRevenuePerLiquidityUnit; // Track last revenue per unit when user's revenue was updated
     }
 
     mapping(uint256 => Market) public markets;
     mapping(uint256 => mapping(address => UserBalance)) public userBalances;
     mapping(uint256 => mapping(address => LiquidityInfo)) public liquidityContributions;
+    mapping(uint256 => uint256) public totalMarketLiquidity; // Track total liquidity per market
+    mapping(uint256 => uint256) public revenuePerLiquidityUnit; // Track revenue per unit of liquidity
     mapping(address => uint256[]) public userMarkets;
     mapping(string => uint256[]) public categoryMarkets;
 
@@ -137,6 +141,7 @@ contract PolyBet is Ownable {
         uint256 ethAmount,
         uint256 tokensAmount
     );
+    event LPRevenueClaimed(uint256 indexed marketAddress, address indexed provider, uint256 revenueAmount);
     event MarketExpired(uint256 indexed marketAddress, uint256 expirationTime);
 
     /////////////////
@@ -270,6 +275,15 @@ contract PolyBet is Ownable {
 
         userBalances[marketAddress][msg.sender] = UserBalance({ yesTokens: yesLocked, noTokens: noLocked });
 
+        // Initialize liquidity tracking
+        liquidityContributions[marketAddress][msg.sender] = LiquidityInfo({
+            contribution: msg.value,
+            totalLiquidity: msg.value,
+            accumulatedRevenue: 0,
+            lastRevenuePerLiquidityUnit: 0
+        });
+        totalMarketLiquidity[marketAddress] = msg.value;
+
         userMarkets[msg.sender].push(marketAddress);
         categoryMarkets[_category].push(marketAddress);
 
@@ -281,11 +295,20 @@ contract PolyBet is Ownable {
     ) external payable marketExists(_marketAddress) predictionNotReported(_marketAddress) marketActive(_marketAddress) {
         Market storage market = markets[_marketAddress];
 
+        // Update user's accumulated revenue before adding new liquidity
+        _updateUserAccumulatedRevenue(_marketAddress, msg.sender);
+
+        // Distribute existing trading revenue proportionally before adding new liquidity
+        if (market.lpTradingRevenue > 0 && totalMarketLiquidity[_marketAddress] > 0) {
+            _distributeTradingRevenue(_marketAddress);
+        }
+
         market.ethCollateral += msg.value;
 
         LiquidityInfo storage liqInfo = liquidityContributions[_marketAddress][msg.sender];
         liqInfo.contribution += msg.value;
         liqInfo.totalLiquidity += msg.value;
+        totalMarketLiquidity[_marketAddress] += msg.value;
 
         uint256 tokensAmount = (msg.value * PRECISION) / market.initialTokenValue;
         market.yesTokenSupply += tokensAmount;
@@ -309,6 +332,14 @@ contract PolyBet is Ownable {
             revert PolyBet__InsufficientLiquidity();
         }
 
+        // Update user's accumulated revenue before removing liquidity
+        _updateUserAccumulatedRevenue(_marketAddress, msg.sender);
+
+        // Distribute existing trading revenue proportionally before removing liquidity
+        if (market.lpTradingRevenue > 0 && totalMarketLiquidity[_marketAddress] > 0) {
+            _distributeTradingRevenue(_marketAddress);
+        }
+
         uint256 amountTokenToBurn = (_ethToWithdraw * PRECISION) / market.initialTokenValue;
 
         if (amountTokenToBurn > market.yesTokenSupply) {
@@ -319,18 +350,25 @@ contract PolyBet is Ownable {
             revert PolyBet__InsufficientTokenReserve(Outcome.NO, amountTokenToBurn);
         }
 
+        // Calculate proportional revenue share
+        uint256 revenueShare = (liqInfo.accumulatedRevenue * _ethToWithdraw) / liqInfo.contribution;
+        uint256 totalToWithdraw = _ethToWithdraw + revenueShare;
+
         liqInfo.contribution -= _ethToWithdraw;
         liqInfo.totalLiquidity -= _ethToWithdraw;
+        liqInfo.accumulatedRevenue -= revenueShare;
+        // Keep lastRevenuePerLiquidityUnit the same since we're only removing liquidity, not changing the revenue tracking
+        totalMarketLiquidity[_marketAddress] -= _ethToWithdraw;
         market.ethCollateral -= _ethToWithdraw;
         market.yesTokenSupply -= amountTokenToBurn;
         market.noTokenSupply -= amountTokenToBurn;
 
-        (bool success, ) = msg.sender.call{ value: _ethToWithdraw }("");
+        (bool success, ) = msg.sender.call{ value: totalToWithdraw }("");
         if (!success) {
             revert PolyBet__ETHTransferFailed();
         }
 
-        emit LiquidityRemoved(_marketAddress, msg.sender, _ethToWithdraw, amountTokenToBurn);
+        emit LiquidityRemoved(_marketAddress, msg.sender, totalToWithdraw, amountTokenToBurn);
     }
 
     /**
@@ -367,6 +405,14 @@ contract PolyBet is Ownable {
             revert PolyBet__OnlyOracleCanReport(); // Reuse error for unauthorized access
         }
 
+        // Update creator's accumulated revenue before resolution
+        _updateUserAccumulatedRevenue(_marketAddress, msg.sender);
+
+        // Distribute trading revenue proportionally before resolution
+        if (market.lpTradingRevenue > 0 && totalMarketLiquidity[_marketAddress] > 0) {
+            _distributeTradingRevenue(_marketAddress);
+        }
+
         uint256 contractWinningTokens = market.winningOutcome == 0 ? market.yesTokenSupply : market.noTokenSupply;
         if (contractWinningTokens > 0) {
             ethRedeemed = (contractWinningTokens * market.initialTokenValue) / PRECISION;
@@ -378,8 +424,12 @@ contract PolyBet is Ownable {
             market.ethCollateral -= ethRedeemed;
         }
 
-        uint256 totalEthToSend = ethRedeemed + market.lpTradingRevenue;
-        market.lpTradingRevenue = 0;
+        // Only send the creator's share of trading revenue (their accumulated revenue)
+        LiquidityInfo storage creatorLiqInfo = liquidityContributions[_marketAddress][msg.sender];
+        uint256 creatorRevenueShare = creatorLiqInfo.accumulatedRevenue;
+        creatorLiqInfo.accumulatedRevenue = 0; // Reset creator's accumulated revenue
+
+        uint256 totalEthToSend = ethRedeemed + creatorRevenueShare;
 
         // Burn winning tokens
         if (market.winningOutcome == 0) {
@@ -453,7 +503,12 @@ contract PolyBet is Ownable {
             userBalances[_marketAddress][msg.sender].noTokens += _amountTokenToBuy;
         }
 
-        market.lpTradingRevenue += msg.value;
+        // Distribute trading revenue proportionally to all LPs
+        if (totalMarketLiquidity[_marketAddress] > 0) {
+            _distributeTradingRevenue(_marketAddress, msg.value);
+        } else {
+            market.lpTradingRevenue += msg.value;
+        }
         emit TokensPurchased(_marketAddress, msg.sender, _outcome, _amountTokenToBuy, msg.value);
     }
 
@@ -663,6 +718,92 @@ contract PolyBet is Ownable {
     }
 
     /////////////////////////
+    /// Helper Functions ///
+    ////////////////////////
+
+    /**
+     * @dev Internal function to distribute trading revenue proportionally to all LPs
+     * @param _marketAddress The market ID
+     * @param _newRevenue The new trading revenue to distribute (optional, if 0, distributes existing)
+     */
+    function _distributeTradingRevenue(uint256 _marketAddress, uint256 _newRevenue) internal {
+        Market storage market = markets[_marketAddress];
+        uint256 totalRevenue = market.lpTradingRevenue + _newRevenue;
+
+        if (totalRevenue == 0 || totalMarketLiquidity[_marketAddress] == 0) {
+            return;
+        }
+
+        // Calculate revenue per unit of liquidity and add it to the cumulative total
+        uint256 revenuePerUnit = (totalRevenue * PRECISION) / totalMarketLiquidity[_marketAddress];
+        revenuePerLiquidityUnit[_marketAddress] += revenuePerUnit;
+
+        // Reset the market's trading revenue since we're distributing it
+        market.lpTradingRevenue = 0;
+    }
+
+    /**
+     * @dev Internal function to distribute existing trading revenue proportionally
+     * @param _marketAddress The market ID
+     */
+    function _distributeTradingRevenue(uint256 _marketAddress) internal {
+        _distributeTradingRevenue(_marketAddress, 0);
+    }
+
+    /**
+     * @dev Internal function to update a user's accumulated revenue based on their liquidity contribution
+     * @param _marketAddress The market ID
+     * @param _user The user address
+     */
+    function _updateUserAccumulatedRevenue(uint256 _marketAddress, address _user) internal {
+        LiquidityInfo storage liqInfo = liquidityContributions[_marketAddress][_user];
+
+        if (liqInfo.contribution == 0) {
+            return; // No liquidity contribution
+        }
+
+        // Calculate only the NEW revenue since the last update
+        uint256 currentRevenuePerUnit = revenuePerLiquidityUnit[_marketAddress];
+        uint256 newRevenuePerUnit = currentRevenuePerUnit - liqInfo.lastRevenuePerLiquidityUnit;
+
+        if (newRevenuePerUnit > 0) {
+            // Calculate the user's share of the NEW revenue only
+            uint256 userNewRevenueShare = (liqInfo.contribution * newRevenuePerUnit) / PRECISION;
+
+            // Update accumulated revenue with only the new share
+            liqInfo.accumulatedRevenue += userNewRevenueShare;
+        }
+
+        // Update the last revenue per unit to current value
+        liqInfo.lastRevenuePerLiquidityUnit = currentRevenuePerUnit;
+    }
+
+    /**
+     * @notice Allow LPs to claim their accumulated trading revenue
+     * @param _marketAddress The market ID
+     */
+    function claimLPRevenue(uint256 _marketAddress) external marketExists(_marketAddress) {
+        // Update user's accumulated revenue before claiming
+        _updateUserAccumulatedRevenue(_marketAddress, msg.sender);
+
+        LiquidityInfo storage liqInfo = liquidityContributions[_marketAddress][msg.sender];
+
+        if (liqInfo.accumulatedRevenue == 0) {
+            return; // Nothing to claim
+        }
+
+        uint256 revenueToClaim = liqInfo.accumulatedRevenue;
+        liqInfo.accumulatedRevenue = 0;
+
+        (bool success, ) = msg.sender.call{ value: revenueToClaim }("");
+        if (!success) {
+            revert PolyBet__ETHTransferFailed();
+        }
+
+        emit LPRevenueClaimed(_marketAddress, msg.sender, revenueToClaim);
+    }
+
+    /////////////////////////
     /// Getter Functions ///
     ////////////////////////
 
@@ -744,10 +885,24 @@ contract PolyBet is Ownable {
         external
         view
         marketExists(_marketAddress)
-        returns (uint256 userContribution, uint256 totalLiquidity, bool hasContribution)
+        returns (uint256 userContribution, uint256 totalLiquidity, uint256 accumulatedRevenue, bool hasContribution)
     {
         LiquidityInfo storage liqInfo = liquidityContributions[_marketAddress][_user];
-        return (liqInfo.contribution, liqInfo.totalLiquidity, liqInfo.contribution > 0);
+
+        // Calculate current accumulated revenue including any unclaimed revenue
+        uint256 currentAccumulatedRevenue = liqInfo.accumulatedRevenue;
+        if (liqInfo.contribution > 0) {
+            // Calculate only the NEW revenue since the last update
+            uint256 currentRevenuePerUnit = revenuePerLiquidityUnit[_marketAddress];
+            uint256 newRevenuePerUnit = currentRevenuePerUnit - liqInfo.lastRevenuePerLiquidityUnit;
+
+            if (newRevenuePerUnit > 0) {
+                uint256 additionalRevenue = (liqInfo.contribution * newRevenuePerUnit) / PRECISION;
+                currentAccumulatedRevenue += additionalRevenue;
+            }
+        }
+
+        return (liqInfo.contribution, liqInfo.totalLiquidity, currentAccumulatedRevenue, liqInfo.contribution > 0);
     }
 
     /**

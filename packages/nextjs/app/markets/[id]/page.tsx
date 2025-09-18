@@ -267,6 +267,7 @@ const MarketDetail: NextPage = () => {
         functionName: "buyTokensWithETH",
         args: [BigInt(marketAddress), outcome, tokenAmountWei], // marketAddress is now the market ID
         value: ethAmountWei, // Use the calculated ETH price
+        gas: BigInt(5000000), // Set gas limit for Somnia
       });
 
       console.log("Tokens purchased successfully!");
@@ -314,6 +315,7 @@ const MarketDetail: NextPage = () => {
         abi: POLYBET_ABI,
         functionName: "resolveMarketAndWithdraw",
         args: [BigInt(marketAddress)], // marketAddress is now the market ID
+        gas: BigInt(5000000), // Set gas limit for Somnia
       });
 
       console.log("Market resolved successfully!", result);
@@ -372,6 +374,7 @@ const MarketDetail: NextPage = () => {
         abi: POLYBET_ABI,
         functionName: "redeemWinningTokens",
         args: [BigInt(marketAddress), parseEther(winningBalance)], // marketAddress is now the market ID
+        gas: BigInt(5000000), // Set gas limit for Somnia
       });
 
       console.log("Tokens redeemed successfully!", result);

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "~~/lib/prisma";
 
-export async function GET(request: NextRequest, { params }: { params: { address: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ address: string }> }) {
   try {
-    const { address } = params;
+    const { address } = await params;
 
     const market = await prisma.market.findUnique({
       where: { address },
@@ -31,9 +31,9 @@ export async function GET(request: NextRequest, { params }: { params: { address:
   }
 }
 
-export async function PUT(request: NextRequest, { params }: { params: { address: string } }) {
+export async function PUT(request: NextRequest, { params }: { params: Promise<{ address: string }> }) {
   try {
-    const { address } = params;
+    const { address } = await params;
     const body = await request.json();
 
     const market = await prisma.market.update({

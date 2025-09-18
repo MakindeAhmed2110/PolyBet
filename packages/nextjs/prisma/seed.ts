@@ -10,47 +10,47 @@ async function main() {
     {
       name: "crypto",
       description: "Cryptocurrency and blockchain related predictions",
-      icon: "₿",
+      icon: "",
     },
     {
       name: "sports",
       description: "Sports events, matches, and competitions",
-      icon: "⚽",
+      icon: "",
     },
     {
       name: "politics",
       description: "Political events, elections, and policy decisions",
-      icon: "🏛️",
+      icon: "",
     },
     {
       name: "tech",
       description: "Technology, AI, and innovation predictions",
-      icon: "💻",
+      icon: "",
     },
     {
       name: "economics",
       description: "Economic indicators, market trends, and financial events",
-      icon: "📈",
+      icon: "",
     },
     {
       name: "weather",
       description: "Weather patterns and climate events",
-      icon: "🌤️",
+      icon: "",
     },
     {
       name: "entertainment",
       description: "Movies, TV shows, music, and entertainment industry",
-      icon: "🎬",
+      icon: "",
     },
     {
       name: "science",
       description: "Scientific discoveries, research, and breakthroughs",
-      icon: "🔬",
+      icon: "",
     },
     {
       name: "other",
       description: "Miscellaneous predictions that don't fit other categories",
-      icon: "📋",
+      icon: "",
     },
   ];
 

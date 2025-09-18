@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   50312: {
     PolyBet: {
-      address: "0x02308D513dA8e27adED9d40EFa0FA5f16c4e0a55",
+      address: "0xcd21605198622F0ca7FE9AB8cB2181Ab401521f6",
       abi: [
         {
           inputs: [
@@ -179,6 +179,31 @@ const deployedContracts = {
           inputs: [],
           name: "PolyBet__TokenTransferFailed",
           type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "marketAddress",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "provider",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "revenueAmount",
+              type: "uint256",
+            },
+          ],
+          name: "LPRevenueClaimed",
+          type: "event",
         },
         {
           anonymous: false,
@@ -535,6 +560,19 @@ const deployedContracts = {
         {
           inputs: [
             {
+              internalType: "uint256",
+              name: "_marketAddress",
+              type: "uint256",
+            },
+          ],
+          name: "claimLPRevenue",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
               internalType: "string",
               name: "_question",
               type: "string",
@@ -857,6 +895,11 @@ const deployedContracts = {
               type: "uint256",
             },
             {
+              internalType: "uint256",
+              name: "accumulatedRevenue",
+              type: "uint256",
+            },
+            {
               internalType: "bool",
               name: "hasContribution",
               type: "bool",
@@ -933,6 +976,16 @@ const deployedContracts = {
             {
               internalType: "uint256",
               name: "totalLiquidity",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "accumulatedRevenue",
+              type: "uint256",
+            },
+            {
+              internalType: "uint256",
+              name: "lastRevenuePerLiquidityUnit",
               type: "uint256",
             },
           ],
@@ -1138,6 +1191,25 @@ const deployedContracts = {
           inputs: [
             {
               internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "revenuePerLiquidityUnit",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
               name: "_marketAddress",
               type: "uint256",
             },
@@ -1155,6 +1227,25 @@ const deployedContracts = {
           name: "sellTokensForEth",
           outputs: [],
           stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "totalMarketLiquidity",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          stateMutability: "view",
           type: "function",
         },
         {
@@ -1231,7 +1322,7 @@ const deployedContracts = {
       },
     },
     PolyBetFactory: {
-      address: "0x05F6c099A0899830396D6b94b03A8a2EebB8Ef98",
+      address: "0xD1FF398e2F29a5cd988d90612A7c77211F7E19e2",
       abi: [
         {
           inputs: [
@@ -1544,7 +1635,7 @@ const deployedContracts = {
       inheritedFunctions: {},
     },
     PolyBetRegistry: {
-      address: "0xbfaA6EaBFD3891532fFd7C2aD4252f579935dC93",
+      address: "0x8121D32141119F9de7386e2742E2daF368B52F29",
       abi: [
         {
           inputs: [

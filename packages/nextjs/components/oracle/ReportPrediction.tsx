@@ -2,25 +2,12 @@
 
 import { useCallback, useState } from "react";
 import { useAccount, usePublicClient, useWriteContract } from "wagmi";
+import deployedContracts from "~~/contracts/deployedContracts";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 import { useMarkets } from "~~/hooks/useMarkets";
 
-// ABI for the report function
-const POLYBET_ABI = [
-  {
-    inputs: [
-      {
-        internalType: "enum PolyBet.Outcome",
-        name: "_winningOutcome",
-        type: "uint8",
-      },
-    ],
-    name: "report",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-] as const;
+// Get the PolyBet contract ABI from deployed contracts
+const POLYBET_ABI = deployedContracts[50312].PolyBet.abi;
 
 interface ReportPredictionProps {
   onMarketReported?: () => void;
@@ -64,12 +51,13 @@ export function ReportPrediction({ onMarketReported }: ReportPredictionProps) {
 
     setIsLoading(true);
     try {
-      // Call the report function on the selected market contract
+      // Call the report function on the PolyBet contract
       await writeContractAsync({
-        address: selectedMarket as `0x${string}`,
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
         abi: POLYBET_ABI,
         functionName: "report",
-        args: [selectedOutcome === "YES" ? 0 : 1], // 0 = YES, 1 = NO
+        args: [BigInt(selectedMarket), selectedOutcome === "YES" ? 0 : 1], // market ID and outcome (0 = YES, 1 = NO)
+        gas: BigInt(5000000), // Set gas limit for Somnia
       });
 
       console.log("Market reported successfully!");
