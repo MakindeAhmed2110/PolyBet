@@ -90,12 +90,6 @@ contract PolyBet is Ownable {
 
     uint256 private constant PRECISION = 1e18;
 
-    /// Checkpoint 2 ///
-
-    /// Checkpoint 3 ///
-
-    /// Checkpoint 5 ///
-
     /////////////////////////
     /// Events //////
     /////////////////////////
@@ -392,10 +386,10 @@ contract PolyBet is Ownable {
     }
 
     /**
-     * @notice Creator can redeem winning tokens and get ETH from the contract including LP revenue and collateral back
+     * @notice Creator can redeem winning tokens and get STT from the contract including LP revenue and collateral back
      * @dev Only callable by the market creator and only if the prediction is resolved
      * @param _marketAddress The market ID
-     * @return ethRedeemed The amount of ETH redeemed
+     * @return ethRedeemed The amount of STT redeemed
      */
     function resolveMarketAndWithdraw(
         uint256 _marketAddress
@@ -464,7 +458,7 @@ contract PolyBet is Ownable {
     }
 
     /**
-     * @notice Buy prediction outcome tokens with ETH
+     * @notice Buy prediction outcome tokens with STT
      * @param _marketAddress The market ID
      * @param _outcome The possible outcome (YES or NO) to buy tokens for
      * @param _amountTokenToBuy Amount of tokens to purchase
@@ -513,7 +507,7 @@ contract PolyBet is Ownable {
     }
 
     /**
-     * @notice Sell prediction outcome tokens for ETH
+     * @notice Sell prediction outcome tokens for STT
      * @param _marketAddress The market ID
      * @param _outcome The possible outcome (YES or NO) to sell tokens for
      * @param _tradingAmount The amount of tokens to sell
@@ -563,7 +557,7 @@ contract PolyBet is Ownable {
     }
 
     /**
-     * @notice Redeem winning tokens for ETH after prediction is resolved
+     * @notice Redeem winning tokens for STT after prediction is resolved
      * @dev Only if the prediction is resolved
      * @param _marketAddress The market ID
      * @param _amount The amount of winning tokens to redeem
@@ -609,11 +603,11 @@ contract PolyBet is Ownable {
     }
 
     /**
-     * @notice Calculate the total ETH price for buying tokens
+     * @notice Calculate the total STT price for buying tokens
      * @param _marketAddress The market ID
      * @param _outcome The possible outcome (YES or NO) to buy tokens for
      * @param _tradingAmount The amount of tokens to buy
-     * @return The total ETH price
+     * @return The total STT price
      */
     function getBuyPriceInEth(
         uint256 _marketAddress,
@@ -624,11 +618,11 @@ contract PolyBet is Ownable {
     }
 
     /**
-     * @notice Calculate the total ETH price for selling tokens
+     * @notice Calculate the total STT price for selling tokens
      * @param _marketAddress The market ID
      * @param _outcome The possible outcome (YES or NO) to sell tokens for
      * @param _tradingAmount The amount of tokens to sell
-     * @return The total ETH price
+     * @return The total STT price
      */
     function getSellPriceInEth(
         uint256 _marketAddress,
@@ -643,7 +637,7 @@ contract PolyBet is Ownable {
     ////////////////////////
 
     /**
-     * @dev Internal helper to calculate ETH price for both buying and selling
+     * @dev Internal helper to calculate STT price for both buying and selling
      * @param _marketAddress The market ID
      * @param _outcome The possible outcome (YES or NO)
      * @param _tradingAmount The amount of tokens
