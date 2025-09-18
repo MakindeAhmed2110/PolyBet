@@ -6,73 +6,11 @@ import Link from "next/link";
 import type { NextPage } from "next";
 import { formatEther, parseEther } from "viem";
 import { useAccount, usePublicClient, useWriteContract } from "wagmi";
+import deployedContracts from "~~/contracts/deployedContracts";
 import { useMarkets } from "~~/hooks/useMarkets";
 
-// ABI for the liquidity functions
-const POLYBET_ABI = [
-  {
-    inputs: [],
-    name: "addLiquidity",
-    outputs: [],
-    stateMutability: "payable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "uint256",
-        name: "_ethToWithdraw",
-        type: "uint256",
-      },
-    ],
-    name: "removeLiquidity",
-    outputs: [],
-    stateMutability: "nonpayable",
-    type: "function",
-  },
-  {
-    inputs: [
-      {
-        internalType: "address",
-        name: "_user",
-        type: "address",
-      },
-    ],
-    name: "getUserLiquidityInfo",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "userContribution",
-        type: "uint256",
-      },
-      {
-        internalType: "uint256",
-        name: "totalLiquidity",
-        type: "uint256",
-      },
-      {
-        internalType: "bool",
-        name: "hasContribution",
-        type: "bool",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-  {
-    inputs: [],
-    name: "totalLiquidityProvided",
-    outputs: [
-      {
-        internalType: "uint256",
-        name: "",
-        type: "uint256",
-      },
-    ],
-    stateMutability: "view",
-    type: "function",
-  },
-] as const;
+// Get the PolyBet contract ABI from deployed contracts
+const POLYBET_ABI = deployedContracts[50312].PolyBet.abi;
 
 const LiquidityProvider: NextPage = () => {
   const { address } = useAccount();
@@ -83,6 +21,7 @@ const LiquidityProvider: NextPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userLiquidityContributions, setUserLiquidityContributions] = useState<Record<string, number>>({});
   const [marketTotalLiquidity, setMarketTotalLiquidity] = useState<Record<string, number>>({});
+  const [userAccumulatedRevenue, setUserAccumulatedRevenue] = useState<Record<string, number>>({});
 
   // Fetch markets from database
   const {
@@ -100,8 +39,14 @@ const LiquidityProvider: NextPage = () => {
   // Memoize market addresses to prevent infinite loops
   const marketAddresses = useMemo(() => markets.map(m => m.address), [markets]);
 
-  // Get the write contract hook
-  const { writeContractAsync } = useWriteContract();
+  // Get the write contract hook with gas configuration
+  const { writeContractAsync } = useWriteContract({
+    mutation: {
+      onError: error => {
+        console.error("Transaction error:", error);
+      },
+    },
+  });
 
   // Fetch total liquidity for all markets
   const fetchMarketTotalLiquidity = useCallback(async () => {
@@ -117,12 +62,14 @@ const LiquidityProvider: NextPage = () => {
       for (const market of markets) {
         try {
           const totalLiquidityProvided = await publicClient.readContract({
-            address: market.address as `0x${string}`,
+            address: deployedContracts[50312].PolyBet.address as `0x${string}`,
             abi: POLYBET_ABI,
-            functionName: "totalLiquidityProvided",
+            functionName: "getUserLiquidityInfo",
+            args: [BigInt(market.address), "0x0000000000000000000000000000000000000000"], // market ID and zero address for total
           });
 
-          totalLiquidity[market.address] = parseFloat(formatEther(totalLiquidityProvided as bigint));
+          // getUserLiquidityInfo returns (userContribution, totalLiquidity, accumulatedRevenue, hasContribution)
+          totalLiquidity[market.address] = parseFloat(formatEther(totalLiquidityProvided[1] as bigint));
         } catch (error) {
           console.error(`Error fetching total liquidity for market ${market.address}:`, error);
           // Fallback to initial liquidity from database if contract call fails
@@ -137,40 +84,50 @@ const LiquidityProvider: NextPage = () => {
     }
   }, [publicClient, marketAddresses]);
 
-  // Fetch user liquidity contributions for all markets
+  // Fetch user liquidity contributions and accumulated revenue for all markets
   const fetchUserLiquidityContributions = useCallback(async () => {
     if (!address || !publicClient || markets.length === 0) {
       setUserLiquidityContributions({});
+      setUserAccumulatedRevenue({});
       return;
     }
 
     try {
       const contributions: Record<string, number> = {};
+      const accumulatedRevenue: Record<string, number> = {};
 
       // Fetch liquidity info for each market
       for (const market of markets) {
         try {
           const liquidityInfo = await publicClient.readContract({
-            address: market.address as `0x${string}`,
+            address: deployedContracts[50312].PolyBet.address as `0x${string}`,
             abi: POLYBET_ABI,
             functionName: "getUserLiquidityInfo",
-            args: [address],
+            args: [BigInt(market.address), address], // market ID and user address
           });
 
           const userContribution = parseFloat(formatEther(liquidityInfo[0] as bigint));
+          const revenue = parseFloat(formatEther(liquidityInfo[2] as bigint)); // accumulatedRevenue is at index 2
+
           if (userContribution > 0) {
             contributions[market.address] = userContribution;
+          }
+          if (revenue > 0) {
+            accumulatedRevenue[market.address] = revenue;
           }
         } catch (error) {
           console.error(`Error fetching liquidity for market ${market.address}:`, error);
           contributions[market.address] = 0;
+          accumulatedRevenue[market.address] = 0;
         }
       }
 
       setUserLiquidityContributions(contributions);
+      setUserAccumulatedRevenue(accumulatedRevenue);
     } catch (error) {
       console.error("Error fetching user liquidity contributions:", error);
       setUserLiquidityContributions({});
+      setUserAccumulatedRevenue({});
     }
   }, [address, publicClient, marketAddresses]);
 
@@ -196,12 +153,14 @@ const LiquidityProvider: NextPage = () => {
 
     setIsLoading(true);
     try {
-      // Call the addLiquidity function on the selected market contract
+      // Call the addLiquidity function on the PolyBet contract
       await writeContractAsync({
-        address: selectedBet as `0x${string}`,
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
         abi: POLYBET_ABI,
         functionName: "addLiquidity",
+        args: [BigInt(selectedBet)], // market ID
         value: parseEther(liquidityAmount),
+        gas: BigInt(5000000), // Set gas limit for Somnia
       });
 
       console.log("Liquidity added successfully!");
@@ -243,12 +202,13 @@ const LiquidityProvider: NextPage = () => {
 
     setIsLoading(true);
     try {
-      // Call the removeLiquidity function on the selected market contract
+      // Call the removeLiquidity function on the PolyBet contract
       await writeContractAsync({
-        address: selectedBet as `0x${string}`,
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
         abi: POLYBET_ABI,
         functionName: "removeLiquidity",
-        args: [parseEther(removeAmount)],
+        args: [BigInt(selectedBet), parseEther(removeAmount)], // market ID and amount
+        gas: BigInt(5000000), // Set gas limit for Somnia
       });
 
       console.log("Liquidity removed successfully!");
@@ -266,6 +226,38 @@ const LiquidityProvider: NextPage = () => {
     } catch (error) {
       console.error("Error removing liquidity:", error);
       alert("Failed to remove liquidity. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Claim LP revenue for a specific market
+  const handleClaimLPRevenue = async (marketAddress: string) => {
+    if (!address) {
+      alert("Please connect your wallet first");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await writeContractAsync({
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
+        abi: POLYBET_ABI,
+        functionName: "claimLPRevenue",
+        args: [BigInt(marketAddress)], // market ID
+        gas: BigInt(5000000), // Set gas limit for Somnia
+      });
+
+      console.log("LP revenue claimed successfully!");
+      alert("LP revenue claimed successfully!");
+
+      // Refresh liquidity data after a short delay
+      setTimeout(() => {
+        fetchUserLiquidityContributions();
+      }, 2000);
+    } catch (error) {
+      console.error("Error claiming LP revenue:", error);
+      alert("Failed to claim LP revenue. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -375,6 +367,8 @@ const LiquidityProvider: NextPage = () => {
                       const isOwner = address && market.creatorAddress?.toLowerCase() === address.toLowerCase();
                       const userContribution = userLiquidityContributions[market.address] || 0;
                       const hasUserContribution = userContribution > 0;
+                      const accumulatedRevenue = userAccumulatedRevenue[market.address] || 0;
+                      const hasAccumulatedRevenue = accumulatedRevenue > 0;
 
                       return (
                         <div
@@ -401,6 +395,11 @@ const LiquidityProvider: NextPage = () => {
                                 {hasUserContribution && (
                                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
                                     Your Liquidity: {userContribution.toFixed(4)} ETH
+                                  </span>
+                                )}
+                                {hasAccumulatedRevenue && (
+                                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                                    Revenue: {accumulatedRevenue.toFixed(4)} ETH
                                   </span>
                                 )}
                               </div>
@@ -438,7 +437,7 @@ const LiquidityProvider: NextPage = () => {
                               </div>
                             </div>
 
-                            <div className="ml-4">
+                            <div className="ml-4 flex flex-col items-end space-y-2">
                               <div
                                 className={`w-4 h-4 rounded-full border-2 ${
                                   selectedBet === market.address ? "border-blue-500 bg-blue-500" : "border-gray-300"
@@ -448,6 +447,18 @@ const LiquidityProvider: NextPage = () => {
                                   <div className="w-2 h-2 bg-white rounded-full mx-auto mt-0.5"></div>
                                 )}
                               </div>
+                              {hasAccumulatedRevenue && (
+                                <button
+                                  onClick={e => {
+                                    e.stopPropagation();
+                                    handleClaimLPRevenue(market.address);
+                                  }}
+                                  disabled={isLoading}
+                                  className="px-3 py-1 bg-green-600 text-white text-xs font-medium rounded hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                  Claim Revenue
+                                </button>
+                              )}
                             </div>
                           </div>
                         </div>

@@ -61,7 +61,12 @@ export const useTransactor = (_walletClient?: WalletClient): TransactionFunc => 
         const result = await tx();
         transactionHash = result;
       } else if (tx != null) {
-        transactionHash = await walletClient.sendTransaction(tx as SendTransactionParameters);
+        // Add minimum gas limit to direct transactions
+        const transactionWithGas = {
+          ...tx,
+          gas: BigInt(5000000), // Set minimum gas limit to 5,000,000
+        } as SendTransactionParameters;
+        transactionHash = await walletClient.sendTransaction(transactionWithGas);
       } else {
         throw new Error("Incorrect transaction passed to transactor");
       }

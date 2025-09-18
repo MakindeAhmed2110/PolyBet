@@ -37,6 +37,11 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/liquidity-provider",
     icon: <BanknotesIcon className="h-4 w-4" />,
   },
+  {
+    label: "Oracle",
+    href: "/oracle",
+    icon: <ChartBarIcon className="h-4 w-4" />,
+  },
 ];
 
 export const HeaderMenuLinks = () => {

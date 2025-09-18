@@ -29,7 +29,7 @@ const deployPolyBet: DeployFunction = async function (hre: HardhatRuntimeEnviron
   console.log("📋 Deployer:", deployer);
   console.log("🔮 Oracle:", oracleAddress);
 
-  // 1. Deploy PolyBetRegistry (with zero address initially)
+  // 1. Deploy PolyBetRegistry first (with zero address initially)
   console.log("\n📄 Deploying PolyBetRegistry...");
   await deploy("PolyBetRegistry", {
     from: deployer,
@@ -42,11 +42,24 @@ const deployPolyBet: DeployFunction = async function (hre: HardhatRuntimeEnviron
   const registryAddress = await registry.getAddress();
   console.log("✅ PolyBetRegistry deployed to:", registryAddress);
 
-  // 2. Deploy PolyBetFactory with registry address
+  // 2. Deploy PolyBet main contract with registry address
+  console.log("\n🎯 Deploying PolyBet...");
+  await deploy("PolyBet", {
+    from: deployer,
+    args: [oracleAddress, registryAddress],
+    log: true,
+    autoMine: true,
+  });
+
+  const polyBet = await hre.ethers.getContract<Contract>("PolyBet", deployer);
+  const polyBetAddress = await polyBet.getAddress();
+  console.log("✅ PolyBet deployed to:", polyBetAddress);
+
+  // 3. Deploy PolyBetFactory with all addresses
   console.log("\n🏭 Deploying PolyBetFactory...");
   await deploy("PolyBetFactory", {
     from: deployer,
-    args: [oracleAddress, registryAddress],
+    args: [oracleAddress, registryAddress, polyBetAddress],
     log: true,
     autoMine: true,
   });
@@ -55,13 +68,14 @@ const deployPolyBet: DeployFunction = async function (hre: HardhatRuntimeEnviron
   const factoryAddress = await factory.getAddress();
   console.log("✅ PolyBetFactory deployed to:", factoryAddress);
 
-  // 3. Link Factory to Registry
+  // 4. Link Factory to Registry
   console.log("\n🔗 Linking Factory to Registry...");
   const setFactoryTx = await registry.setFactory(factoryAddress);
   await setFactoryTx.wait();
   console.log("✅ Factory linked to Registry");
 
   console.log("\n🎉 PolyBet Platform deployment complete!");
+  console.log("🎯 PolyBet:", polyBetAddress);
   console.log("📊 Factory:", factoryAddress);
   console.log("📋 Registry:", registryAddress);
 };

@@ -19,10 +19,11 @@ const Oracle: NextPage = () => {
     contractName: "PolyBetRegistry",
   });
 
-  const { data: markets, isLoading: isMarketsLoading } = useScaffoldReadContract({
-    contractName: "PolyBetRegistry",
-    functionName: "getAllMarkets",
-  });
+  // Note: We're using database markets instead of registry markets for better data structure
+  // const { data: markets, isLoading: isMarketsLoading } = useScaffoldReadContract({
+  //   contractName: "PolyBetRegistry",
+  //   functionName: "getAllMarkets",
+  // });
 
   // Get the oracle address from the factory
   const { data: factoryInfo } = useScaffoldReadContract({
@@ -101,7 +102,7 @@ const Oracle: NextPage = () => {
   // Get last updated time
   const lastUpdated = allMarketsData ? new Date().toLocaleTimeString() : null;
 
-  if (isFactoryLoading || isRegistryLoading || isMarketsLoading || allMarketsLoading) {
+  if (isFactoryLoading || isRegistryLoading || allMarketsLoading) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[60vh] gap-4">
         <div className="loading loading-spinner loading-lg"></div>
@@ -110,11 +111,11 @@ const Oracle: NextPage = () => {
     );
   }
 
-  if (!factory || !registry || !markets || markets.length === 0) {
+  if (!factory || !registry) {
     return (
       <div className="flex justify-center items-center min-h-[60vh]">
         <div className="alert alert-warning max-w-md center flex justify-center">
-          <span>🔮 No prediction markets available!</span>
+          <span>🔮 Loading contracts...</span>
         </div>
       </div>
     );
