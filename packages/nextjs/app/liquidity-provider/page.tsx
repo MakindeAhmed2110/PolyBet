@@ -71,6 +71,90 @@ const LiquidityProvider: NextPage = () => {
       setSelectedBet(null);
     } catch (error) {
       console.error("Error adding liquidity:", error);
+<<<<<<< HEAD
+=======
+      alert("Failed to add liquidity. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemoveLiquidity = async () => {
+    if (!selectedBet || !removeAmount || !address) return;
+
+    // Validate input
+    const amount = parseFloat(removeAmount);
+    if (isNaN(amount) || amount <= 0) {
+      alert("Please enter a valid amount to remove");
+      return;
+    }
+
+    // Check if user has enough liquidity
+    const userContribution = userLiquidityContributions[selectedBet] || 0;
+    if (amount > userContribution) {
+      alert(`You can only remove up to ${userContribution} STT`);
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      // Call the removeLiquidity function on the PolyBet contract
+      await writeContractAsync({
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
+        abi: POLYBET_ABI,
+        functionName: "removeLiquidity",
+        args: [BigInt(selectedBet), parseEther(removeAmount)], // market ID and amount
+        gas: BigInt(5000000), // Set gas limit for Somnia
+      });
+
+      console.log("Liquidity removed successfully!");
+      alert("Liquidity removed successfully!");
+
+      // Reset form and refresh liquidity data
+      setRemoveAmount("");
+      setSelectedBet(null);
+
+      // Refresh liquidity data after a short delay
+      setTimeout(() => {
+        fetchMarketTotalLiquidity();
+        fetchUserLiquidityContributions();
+      }, 2000);
+    } catch (error) {
+      console.error("Error removing liquidity:", error);
+      alert("Failed to remove liquidity. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Claim LP revenue for a specific market
+  const handleClaimLPRevenue = async (marketAddress: string) => {
+    if (!address) {
+      alert("Please connect your wallet first");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      await writeContractAsync({
+        address: deployedContracts[50312].PolyBet.address as `0x${string}`,
+        abi: POLYBET_ABI,
+        functionName: "claimLPRevenue",
+        args: [BigInt(marketAddress)], // market ID
+        gas: BigInt(5000000), // Set gas limit for Somnia
+      });
+
+      console.log("LP revenue claimed successfully!");
+      alert("LP revenue claimed successfully!");
+
+      // Refresh liquidity data after a short delay
+      setTimeout(() => {
+        fetchUserLiquidityContributions();
+      }, 2000);
+    } catch (error) {
+      console.error("Error claiming LP revenue:", error);
+      alert("Failed to claim LP revenue. Please try again.");
+>>>>>>> 2e9faa2 (last)
     } finally {
       setIsLoading(false);
     }
@@ -79,31 +163,6 @@ const LiquidityProvider: NextPage = () => {
   return (
     <>
       <div className="min-h-screen bg-white">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-4">
-                <Link href="/user" className="p-2 hover:bg-gray-100 rounded-lg">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </Link>
-                <Image src="/polybet.png" alt="PolyBet Logo" width={32} height={32} className="w-8 h-8" />
-                <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "PolySans Median, sans-serif" }}>
-                  PolyBet
-                </h1>
-              </div>
-              <div className="flex items-center space-x-4">
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium">How it works</button>
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium">Log In</button>
-                <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 font-medium">
-                  Sign Up
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Main Content */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -159,10 +218,95 @@ const LiquidityProvider: NextPage = () => {
                             {bet.title}
                           </h3>
 
+<<<<<<< HEAD
                           <div className="grid grid-cols-2 gap-4 text-sm">
                             <div>
                               <p className="text-gray-500">Volume</p>
                               <p className="font-semibold text-gray-900">{bet.volume}</p>
+=======
+                {/* Markets List */}
+                {!marketsLoading && !marketsError && markets.length > 0 && (
+                  <div className="space-y-4">
+                    {markets.map(market => {
+                      const yesProbability = market.initialYesProbability;
+                      //const noProbability = 100 - yesProbability;
+                      const expirationDate = new Date(market.expirationTime).toLocaleDateString();
+                      const currentLiquidity = marketTotalLiquidity[market.address]
+                        ? marketTotalLiquidity[market.address].toFixed(2)
+                        : parseFloat(market.initialLiquidity).toFixed(2);
+                      const totalVolume = parseFloat(market.totalVolume).toFixed(2);
+                      const isOwner = address && market.creatorAddress?.toLowerCase() === address.toLowerCase();
+                      const userContribution = userLiquidityContributions[market.address] || 0;
+                      const hasUserContribution = userContribution > 0;
+                      const accumulatedRevenue = userAccumulatedRevenue[market.address] || 0;
+                      const hasAccumulatedRevenue = accumulatedRevenue > 0;
+
+                      return (
+                        <div
+                          key={market.id}
+                          onClick={() => setSelectedBet(market.address)}
+                          className={`p-6 border-2 rounded-lg transition-all cursor-pointer ${
+                            selectedBet === market.address
+                              ? "border-blue-500 bg-blue-50"
+                              : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-3 mb-3">
+                                <span className="px-3 py-1 bg-blue-100 text-blue-800 text-sm font-medium rounded">
+                                  {market.category.icon} {market.category.name}
+                                </span>
+                                <span className="text-gray-500 text-sm">{expirationDate}</span>
+                                {isOwner && (
+                                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                                    Your Market
+                                  </span>
+                                )}
+                                {hasUserContribution && (
+                                  <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                                    Your Liquidity: {userContribution.toFixed(4)} STT
+                                  </span>
+                                )}
+                                {hasAccumulatedRevenue && (
+                                  <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                                    Revenue: {accumulatedRevenue.toFixed(4)} STT
+                                  </span>
+                                )}
+                              </div>
+
+                              <h3
+                                className="text-lg font-semibold text-gray-900 mb-3"
+                                style={{ fontFamily: "PolySans Neutral, sans-serif" }}
+                              >
+                                {market.question}
+                              </h3>
+
+                              {market.description && (
+                                <p className="text-sm text-gray-600 mb-3 line-clamp-2">{market.description}</p>
+                              )}
+
+                              <div className="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                  <p className="text-gray-500">Volume</p>
+                                  <p className="font-semibold text-gray-900">{totalVolume} STT</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-500">Current Liquidity</p>
+                                  <p className="font-semibold text-gray-900">{currentLiquidity} STT</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-500">Yes Probability</p>
+                                  <p className="font-semibold text-green-600">{yesProbability}%</p>
+                                </div>
+                                <div>
+                                  <p className="text-gray-500">Status</p>
+                                  <p className="font-semibold text-blue-600 capitalize">
+                                    {market.status.toLowerCase()}
+                                  </p>
+                                </div>
+                              </div>
+>>>>>>> 2e9faa2 (last)
                             </div>
                             <div>
                               <p className="text-gray-500">Current Liquidity</p>
@@ -215,11 +359,31 @@ const LiquidityProvider: NextPage = () => {
                       <p className="text-sm text-gray-600">
                         {availableBets.find(bet => bet.id === selectedBet)?.title}
                       </p>
+<<<<<<< HEAD
+=======
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {markets.find(market => market.address === selectedBet)?.creatorAddress?.toLowerCase() ===
+                          address?.toLowerCase() && (
+                          <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
+                            Your Market
+                          </span>
+                        )}
+                        {userLiquidityContributions[selectedBet] > 0 && (
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                            Your Liquidity: {userLiquidityContributions[selectedBet].toFixed(4)} STT
+                          </span>
+                        )}
+                      </div>
+>>>>>>> 2e9faa2 (last)
                     </div>
 
                     {/* Amount Input */}
                     <div className="mb-6">
+<<<<<<< HEAD
                       <label className="block text-sm font-medium text-gray-700 mb-2">Liquidity Amount ($SOMI)</label>
+=======
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Liquidity Amount (STT)</label>
+>>>>>>> 2e9faa2 (last)
                       <div className="relative">
                         <input
                           type="number"
@@ -229,7 +393,11 @@ const LiquidityProvider: NextPage = () => {
                           className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+<<<<<<< HEAD
                           <Image src="/somnia.png" alt="$SOMI" width={20} height={20} className="w-5 h-5" />
+=======
+                          <span className="text-gray-500 text-sm">STT</span>
+>>>>>>> 2e9faa2 (last)
                         </div>
                       </div>
                     </div>
@@ -240,7 +408,11 @@ const LiquidityProvider: NextPage = () => {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Your Contribution:</span>
+<<<<<<< HEAD
                           <span className="font-medium">{liquidityAmount || "0"} $SOMI</span>
+=======
+                          <span className="font-medium">{liquidityAmount || "0"} STT</span>
+>>>>>>> 2e9faa2 (last)
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Trading Fee:</span>
@@ -266,6 +438,54 @@ const LiquidityProvider: NextPage = () => {
                       {isLoading ? "Adding Liquidity..." : "Add Liquidity"}
                     </button>
 
+<<<<<<< HEAD
+=======
+                    {/* Remove Liquidity Section */}
+                    {userLiquidityContributions[selectedBet] > 0 && (
+                      <>
+                        <div className="mt-8 pt-6 border-t border-gray-200">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-4">Remove Liquidity</h3>
+
+                          {/* Remove Amount Input */}
+                          <div className="mb-4">
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Amount to Remove (STT)
+                            </label>
+                            <div className="relative">
+                              <input
+                                type="number"
+                                value={removeAmount}
+                                onChange={e => setRemoveAmount(e.target.value)}
+                                placeholder="0.0"
+                                max={userLiquidityContributions[selectedBet]}
+                                className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                              />
+                              <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+                                <span className="text-gray-500 text-sm">STT</span>
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              Max: {userLiquidityContributions[selectedBet].toFixed(4)} STT
+                            </p>
+                          </div>
+
+                          {/* Remove Liquidity Button */}
+                          <button
+                            onClick={handleRemoveLiquidity}
+                            disabled={!removeAmount || isLoading}
+                            className={`w-full py-3 px-4 rounded-lg font-semibold transition-colors ${
+                              removeAmount && !isLoading
+                                ? "bg-red-600 hover:bg-red-700 text-white"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                            }`}
+                          >
+                            {isLoading ? "Removing..." : "Remove Liquidity"}
+                          </button>
+                        </div>
+                      </>
+                    )}
+
+>>>>>>> 2e9faa2 (last)
                     {/* Info */}
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
@@ -308,7 +528,11 @@ const LiquidityProvider: NextPage = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Add Liquidity</h3>
                 <p className="text-gray-600 text-sm">
+<<<<<<< HEAD
                   Provide $SOMI tokens to create liquidity pools for both Yes and No outcomes
+=======
+                  Provide STT to create liquidity pools for both Yes and No outcomes
+>>>>>>> 2e9faa2 (last)
                 </p>
               </div>
               <div className="text-center">

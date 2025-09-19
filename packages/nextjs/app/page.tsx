@@ -58,14 +58,14 @@ const Home: NextPage = () => {
 
   const faqData = [
     {
-      question: "How do I start trading on PolyBet?",
+      question: "How do I start trading on Predikt?",
       answer:
         "Getting started is easy! Simply connect your wallet, browse available markets, and start making predictions. You can trade on crypto prices, political outcomes, sports events, and much more. No KYC required for most markets.",
       icon: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z",
       iconColor: "purple",
     },
     {
-      question: "What blockchain does PolyBet use?",
+      question: "What blockchain does Predikt use?",
       answer:
         "PolyBet is built on the Somnia blockchain, which provides lightning-fast transactions and low fees. This ensures you can trade quickly and efficiently without waiting for slow confirmations or paying high gas fees.",
       icon: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z",
@@ -81,21 +81,21 @@ const Home: NextPage = () => {
     {
       question: "How are markets resolved automatically?",
       answer:
-        "PolyBet uses trusted oracles to automatically resolve markets when events occur. This ensures fair and timely payouts without any manual intervention or disputes. The oracle system is transparent and verifiable on-chain.",
+        "Predikt uses trusted oracles to automatically resolve markets when events occur. This ensures fair and timely payouts without any manual intervention or disputes. The oracle system is transparent and verifiable on-chain.",
       icon: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z",
       iconColor: "orange",
     },
     {
       question: "Can I create my own prediction markets?",
       answer:
-        "Yes! PolyBet is community-driven, and anyone can create prediction markets on topics they're passionate about. Whether it's sports, politics, crypto, or any other event, you can set up markets and invite others to participate.",
+        "Yes! Predikt is community-driven, and anyone can create prediction markets on topics they're passionate about. Whether it's sports, politics, crypto, or any other event, you can set up markets and invite others to participate.",
       icon: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z",
       iconColor: "purple",
     },
     {
       question: "Is my data and funds secure?",
       answer:
-        "Absolutely! PolyBet is fully decentralized and built on smart contracts. Your funds are secured by blockchain technology, and no central authority can freeze or manipulate your assets. You maintain full control of your wallet and data.",
+        "Absolutely! Predikt is fully decentralized and built on smart contracts. Your funds are secured by blockchain technology, and no central authority can freeze or manipulate your assets. You maintain full control of your wallet and data.",
       icon: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-8.293l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 001.414 1.414L9 9.414V13a1 1 0 102 0V9.414l1.293 1.293a1 1 0 001.414-1.414z",
       iconColor: "red",
     },
@@ -204,7 +204,7 @@ const Home: NextPage = () => {
               className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6"
               style={{ fontFamily: "PolySans Median, sans-serif" }}
             >
-              Why Choose PolyBet?
+              Why Choose Predikt?
             </h2>
             <p
               className="text-xl text-gray-600 max-w-3xl mx-auto"

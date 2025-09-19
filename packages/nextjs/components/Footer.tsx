@@ -25,7 +25,7 @@ export const Footer = () => {
             <div className="flex items-center space-x-3 mb-4">
               <Image src="/polybet.png" alt="PolyBet Logo" width={32} height={32} className="w-8 h-8" />
               <span className="text-xl font-bold text-gray-900" style={{ fontFamily: "PolySans Median, sans-serif" }}>
-                PolyBet
+                Predikt
               </span>
             </div>
             <p className="text-gray-600 mb-6 max-w-md" style={{ fontFamily: "PolySans Neutral, sans-serif" }}>
@@ -156,10 +156,10 @@ export const Footer = () => {
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-6">
               <p className="text-gray-500 text-sm" style={{ fontFamily: "PolySans Neutral, sans-serif" }}>
-                © 2025 PolyBet. All rights reserved.
+                © 2025 Predikt. All rights reserved.
               </p>
               <p className="text-gray-500 text-sm" style={{ fontFamily: "PolySans Neutral, sans-serif" }}>
-                Built by the PolyBet team
+                Built by the Predikt team
               </p>
             </div>
 

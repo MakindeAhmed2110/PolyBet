@@ -11,8 +11,8 @@ const spaceGrotesk = Space_Grotesk({
 });
 
 export const metadata = getMetadata({
-  title: "PolyBet",
-  description: "PolyBet",
+  title: "Predikt",
+  description: "The Future Of Prediction Markets",
 });
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
