@@ -104,18 +104,6 @@ const CreateMarket: NextPage = () => {
         return;
       }
 
-      // Debug: Log the parameters being sent
-      console.log("Creating market with parameters:", {
-        question: formData.question,
-        category: selectedCategory.name,
-        initialTokenValue: formData.initialTokenValue,
-        initialYesProbability: formData.initialYesProbability,
-        percentageToLock: formData.percentageToLock,
-        expirationTime: expirationTime,
-        initialLiquidity: formData.initialLiquidity,
-        parsedInitialLiquidity: parseEther(formData.initialLiquidity).toString(),
-      });
-
       // Create market on blockchain
       const txHash = await writeFactoryAsync({
         functionName: "createMarket",
@@ -128,6 +116,7 @@ const CreateMarket: NextPage = () => {
           BigInt(expirationTime),
         ],
         value: parseEther(formData.initialLiquidity),
+        gas: 10000000n,
       });
 
       // Wait for transaction and extract market address from event logs

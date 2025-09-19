@@ -96,6 +96,14 @@ export const NETWORKS_EXTRA_DATA: Record<string, ChainAttributes> = {
  * Gives the block explorer transaction URL, returns empty string if the network is a local chain
  */
 export function getBlockExplorerTxLink(chainId: number, txnHash: string) {
+  const customBlockExplorers: Record<number, string> = {
+    50312: "https://shannon-explorer.somnia.network",
+  };
+
+  if (customBlockExplorers[chainId]) {
+    return `${customBlockExplorers[chainId]}/tx/${txnHash}`;
+  }
+
   const chainNames = Object.keys(chains);
 
   const targetChainArr = chainNames.filter(chainName => {
@@ -122,6 +130,15 @@ export function getBlockExplorerTxLink(chainId: number, txnHash: string) {
  * Defaults to Etherscan if no (wagmi) block explorer is configured for the network.
  */
 export function getBlockExplorerAddressLink(network: chains.Chain, address: string) {
+  const customBlockExplorers: Record<number, string> = {
+    50312: "https://shannon-explorer.somnia.network",
+  };
+
+  // Check if we have a custom block explorer for this chain
+  if (customBlockExplorers[network.id]) {
+    return `${customBlockExplorers[network.id]}/address/${address}`;
+  }
+
   const blockExplorerBaseURL = network.blockExplorers?.default?.url;
   if (network.id === chains.hardhat.id) {
     return `/blockexplorer/address/${address}`;
