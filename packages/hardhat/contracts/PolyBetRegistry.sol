@@ -1,14 +1,24 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
+<<<<<<< HEAD
+contract PrediktRegistry {
+=======
 contract PolyBetRegistry {
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
     /////////////////
     /// Errors //////
     /////////////////
 
+<<<<<<< HEAD
+    error PrediktRegistry__MarketAlreadyRegistered();
+    error PrediktRegistry__MarketNotRegistered();
+    error PrediktRegistry__UnauthorizedAccess();
+=======
     error PolyBetRegistry__MarketAlreadyRegistered();
     error PolyBetRegistry__MarketNotRegistered();
     error PolyBetRegistry__UnauthorizedAccess();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
 
     //////////////////////////
     /// State Variables //////
@@ -60,21 +70,33 @@ contract PolyBetRegistry {
 
     modifier onlyFactory() {
         if (msg.sender != i_factory) {
+<<<<<<< HEAD
+            revert PrediktRegistry__UnauthorizedAccess();
+=======
             revert PolyBetRegistry__UnauthorizedAccess();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
         }
         _;
     }
 
     modifier marketExists(uint256 _marketAddress) {
         if (s_markets[_marketAddress].marketAddress == 0 && s_markets[_marketAddress].creator == address(0)) {
+<<<<<<< HEAD
+            revert PrediktRegistry__MarketNotRegistered();
+=======
             revert PolyBetRegistry__MarketNotRegistered();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
         }
         _;
     }
 
     modifier marketNotExists(uint256 _marketAddress) {
         if (s_markets[_marketAddress].marketAddress != 0 || s_markets[_marketAddress].creator != address(0)) {
+<<<<<<< HEAD
+            revert PrediktRegistry__MarketAlreadyRegistered();
+=======
             revert PolyBetRegistry__MarketAlreadyRegistered();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
         }
         _;
     }
@@ -89,6 +111,16 @@ contract PolyBetRegistry {
 
     /**
      * @notice Set the factory address (can only be called once)
+<<<<<<< HEAD
+     * @param _factory The address of the PrediktFactory contract
+     */
+    function setFactory(address _factory) external {
+        if (i_factory != address(0)) {
+            revert PrediktRegistry__UnauthorizedAccess(); // Factory already set
+        }
+        if (_factory == address(0)) {
+            revert PrediktRegistry__UnauthorizedAccess(); // Cannot set to zero address
+=======
      * @param _factory The address of the PolyBetFactory contract
      */
     function setFactory(address _factory) external {
@@ -97,6 +129,7 @@ contract PolyBetRegistry {
         }
         if (_factory == address(0)) {
             revert PolyBetRegistry__UnauthorizedAccess(); // Cannot set to zero address
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
         }
         i_factory = _factory;
         emit FactorySet(_factory);

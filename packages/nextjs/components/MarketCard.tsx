@@ -147,7 +147,6 @@ export function MarketCard({ market }: MarketCardProps) {
         {/* Volume and Status */}
         <div className="flex items-center justify-between">
           <div className="text-sm text-gray-500">
-            <div>Vol: {parseFloat(market.totalVolume).toFixed(2)} ETH</div>
             <div className="text-xs capitalize">{market.status.toLowerCase()}</div>
           </div>
           <div className="flex space-x-2">

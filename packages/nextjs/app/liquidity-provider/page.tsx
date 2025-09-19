@@ -177,6 +177,7 @@ const LiquidityProvider: NextPage = () => {
       }, 2000);
     } catch (error) {
       console.error("Error adding liquidity:", error);
+
       alert("Failed to add liquidity. Please try again.");
     } finally {
       setIsLoading(false);
@@ -196,7 +197,9 @@ const LiquidityProvider: NextPage = () => {
     // Check if user has enough liquidity
     const userContribution = userLiquidityContributions[selectedBet] || 0;
     if (amount > userContribution) {
-      alert(`You can only remove up to ${userContribution} ETH`);
+
+      alert(`You can only remove up to ${userContribution} STT`);
+
       return;
     }
 
@@ -266,31 +269,6 @@ const LiquidityProvider: NextPage = () => {
   return (
     <>
       <div className="min-h-screen bg-white">
-        {/* Header */}
-        <div className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="flex items-center space-x-4">
-                <Link href="/user" className="p-2 hover:bg-gray-100 rounded-lg">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </Link>
-                <Image src="/polybet.png" alt="PolyBet Logo" width={32} height={32} className="w-8 h-8" />
-                <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "PolySans Median, sans-serif" }}>
-                  PolyBet
-                </h1>
-              </div>
-              <div className="flex items-center space-x-4">
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium">How it works</button>
-                <button className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium">Log In</button>
-                <button className="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800 font-medium">
-                  Sign Up
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Main Content */}
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -394,12 +372,16 @@ const LiquidityProvider: NextPage = () => {
                                 )}
                                 {hasUserContribution && (
                                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                                    Your Liquidity: {userContribution.toFixed(4)} ETH
+
+                                    Your Liquidity: {userContribution.toFixed(4)} STT
+
+
+
                                   </span>
                                 )}
                                 {hasAccumulatedRevenue && (
                                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-                                    Revenue: {accumulatedRevenue.toFixed(4)} ETH
+                                    Revenue: {accumulatedRevenue.toFixed(4)} STT
                                   </span>
                                 )}
                               </div>
@@ -418,11 +400,11 @@ const LiquidityProvider: NextPage = () => {
                               <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
                                   <p className="text-gray-500">Volume</p>
-                                  <p className="font-semibold text-gray-900">{totalVolume} ETH</p>
+                                  <p className="font-semibold text-gray-900">{totalVolume} STT</p>
                                 </div>
                                 <div>
                                   <p className="text-gray-500">Current Liquidity</p>
-                                  <p className="font-semibold text-gray-900">{currentLiquidity} ETH</p>
+                                  <p className="font-semibold text-gray-900">{currentLiquidity} STT</p>
                                 </div>
                                 <div>
                                   <p className="text-gray-500">Yes Probability</p>
@@ -435,6 +417,7 @@ const LiquidityProvider: NextPage = () => {
                                   </p>
                                 </div>
                               </div>
+
                             </div>
 
                             <div className="ml-4 flex flex-col items-end space-y-2">
@@ -501,6 +484,7 @@ const LiquidityProvider: NextPage = () => {
                       <p className="text-sm text-gray-600">
                         {markets.find(market => market.address === selectedBet)?.question}
                       </p>
+
                       <div className="mt-2 flex flex-wrap gap-2">
                         {markets.find(market => market.address === selectedBet)?.creatorAddress?.toLowerCase() ===
                           address?.toLowerCase() && (
@@ -510,15 +494,18 @@ const LiquidityProvider: NextPage = () => {
                         )}
                         {userLiquidityContributions[selectedBet] > 0 && (
                           <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                            Your Liquidity: {userLiquidityContributions[selectedBet].toFixed(4)} ETH
+                            Your Liquidity: {userLiquidityContributions[selectedBet].toFixed(4)} STT
                           </span>
                         )}
                       </div>
+
                     </div>
 
                     {/* Amount Input */}
                     <div className="mb-6">
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Liquidity Amount (ETH)</label>
+
+                      <label className="block text-sm font-medium text-gray-700 mb-2">Liquidity Amount (STT)</label>
+
                       <div className="relative">
                         <input
                           type="number"
@@ -528,7 +515,7 @@ const LiquidityProvider: NextPage = () => {
                           className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                          <span className="text-gray-500 text-sm">ETH</span>
+                          <span className="text-gray-500 text-sm">STT</span>
                         </div>
                       </div>
                     </div>
@@ -539,7 +526,9 @@ const LiquidityProvider: NextPage = () => {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Your Contribution:</span>
-                          <span className="font-medium">{liquidityAmount || "0"} ETH</span>
+
+
+                          <span className="font-medium">{liquidityAmount || "0"} STT</span>
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Trading Fee:</span>
@@ -565,8 +554,9 @@ const LiquidityProvider: NextPage = () => {
                       {isLoading ? "Adding Liquidity..." : "Add Liquidity"}
                     </button>
 
+
                     {/* Remove Liquidity Section */}
-                    {userLiquidityContributions[selectedBet] > 0 && (
+                    {selectedBet && userLiquidityContributions[selectedBet] > 0 && (
                       <>
                         <div className="mt-8 pt-6 border-t border-gray-200">
                           <h3 className="text-lg font-semibold text-gray-900 mb-4">Remove Liquidity</h3>
@@ -574,7 +564,7 @@ const LiquidityProvider: NextPage = () => {
                           {/* Remove Amount Input */}
                           <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-                              Amount to Remove (ETH)
+                              Amount to Remove (STT)
                             </label>
                             <div className="relative">
                               <input
@@ -582,15 +572,15 @@ const LiquidityProvider: NextPage = () => {
                                 value={removeAmount}
                                 onChange={e => setRemoveAmount(e.target.value)}
                                 placeholder="0.0"
-                                max={userLiquidityContributions[selectedBet]}
+                                max={selectedBet ? userLiquidityContributions[selectedBet] : 0}
                                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                               />
                               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                                <span className="text-gray-500 text-sm">ETH</span>
+                                <span className="text-gray-500 text-sm">STT</span>
                               </div>
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                              Max: {userLiquidityContributions[selectedBet].toFixed(4)} ETH
+                              Max: {userLiquidityContributions[selectedBet]?.toFixed(4) || "0"} STT
                             </p>
                           </div>
 
@@ -653,7 +643,7 @@ const LiquidityProvider: NextPage = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Add Liquidity</h3>
                 <p className="text-gray-600 text-sm">
-                  Provide ETH to create liquidity pools for both Yes and No outcomes
+                  Provide STT to create liquidity pools for both Yes and No outcomes
                 </p>
               </div>
               <div className="text-center">

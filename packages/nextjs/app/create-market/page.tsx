@@ -275,6 +275,9 @@ const CreateMarket: NextPage = () => {
                       {errors.initialTokenValue && (
                         <p className="mt-1 text-sm text-red-600">{errors.initialTokenValue}</p>
                       )}
+
+                      <p className="mt-1 text-sm text-gray-500">Value of each token in STT</p>
+
                       <p className="mt-1 text-sm text-gray-500">Value of each token in ETH</p>
                     </div>
 
@@ -334,7 +337,11 @@ const CreateMarket: NextPage = () => {
 
                   {/* Initial Liquidity */}
                   <div>
+
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Initial Liquidity (STT) *</label>
+
                     <label className="block text-sm font-medium text-gray-700 mb-2">Initial Liquidity (ETH) *</label>
+
                     <div className="relative">
                       <input
                         type="number"
@@ -346,7 +353,11 @@ const CreateMarket: NextPage = () => {
                         }`}
                       />
                       <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+
+                        <span className="text-gray-500 text-sm">STT</span>
+
                         <span className="text-gray-500 text-sm">ETH</span>
+
                       </div>
                     </div>
                     {errors.initialLiquidity && <p className="mt-1 text-sm text-red-600">{errors.initialLiquidity}</p>}
@@ -403,6 +414,17 @@ const CreateMarket: NextPage = () => {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Initial Liquidity:</span>
+
+                      <span className="font-medium">{cost.liquidity} STT</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Estimated Gas:</span>
+                      <span className="font-medium">{cost.gas} STT</span>
+                    </div>
+                    <div className="flex justify-between border-t pt-2">
+                      <span className="font-semibold text-gray-900">Total:</span>
+                      <span className="font-semibold text-gray-900">{cost.total.toFixed(3)} STT</span>
+
                       <span className="font-medium">{cost.liquidity} ETH</span>
                     </div>
                     <div className="flex justify-between">
@@ -411,7 +433,8 @@ const CreateMarket: NextPage = () => {
                     </div>
                     <div className="flex justify-between border-t pt-2">
                       <span className="font-semibold text-gray-900">Total:</span>
-                      <span className="font-semibold text-gray-900">{cost.total.toFixed(3)} ETH</span>
+                      <span className="font-semibold text-gray-900">{cost.total.toFixed(3)} STT</span>
+
                     </div>
                   </div>
                 </div>

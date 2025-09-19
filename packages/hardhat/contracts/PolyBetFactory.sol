@@ -1,20 +1,36 @@
 //SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0 <0.9.0;
 
+<<<<<<< HEAD
+import "./Predikt.sol";
+import "./PrediktRegistry.sol";
+
+contract PrediktFactory {
+=======
 import "./PolyBet.sol";
 import "./PolyBetRegistry.sol";
 
 contract PolyBetFactory {
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
     /////////////////
     /// Errors //////
     /////////////////
 
+<<<<<<< HEAD
+    error PrediktFactory__InvalidInitialLiquidity();
+    error PrediktFactory__InvalidProbability();
+    error PrediktFactory__InvalidPercentageToLock();
+    error PrediktFactory__InvalidQuestion();
+    error PrediktFactory__InvalidCategory();
+    error PrediktFactory__InvalidExpirationTime();
+=======
     error PolyBetFactory__InvalidInitialLiquidity();
     error PolyBetFactory__InvalidProbability();
     error PolyBetFactory__InvalidPercentageToLock();
     error PolyBetFactory__InvalidQuestion();
     error PolyBetFactory__InvalidCategory();
     error PolyBetFactory__InvalidExpirationTime();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
 
     //////////////////////////
     /// State Variables //////
@@ -22,7 +38,11 @@ contract PolyBetFactory {
 
     address public immutable i_oracle;
     address public immutable i_registry;
+<<<<<<< HEAD
+    address public immutable i_predikt;
+=======
     address public immutable i_polyBet;
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
     uint256 public s_marketCount;
 
     // Market categories
@@ -49,14 +69,22 @@ contract PolyBetFactory {
 
     modifier validQuestion(string memory _question) {
         if (bytes(_question).length == 0 || bytes(_question).length > 500) {
+<<<<<<< HEAD
+            revert PrediktFactory__InvalidQuestion();
+=======
             revert PolyBetFactory__InvalidQuestion();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
         }
         _;
     }
 
     modifier validCategory(string memory _category) {
         if (bytes(_category).length == 0 || bytes(_category).length > 50) {
+<<<<<<< HEAD
+            revert PrediktFactory__InvalidCategory();
+=======
             revert PolyBetFactory__InvalidCategory();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
         }
         _;
     }
@@ -68,6 +96,15 @@ contract PolyBetFactory {
         uint256 _initialLiquidity
     ) {
         if (_initialLiquidity == 0 || _initialLiquidity > 100 ether) {
+<<<<<<< HEAD
+            revert PrediktFactory__InvalidInitialLiquidity();
+        }
+        if (_initialYesProbability >= 100 || _initialYesProbability == 0) {
+            revert PrediktFactory__InvalidProbability();
+        }
+        if (_percentageToLock >= 100 || _percentageToLock == 0) {
+            revert PrediktFactory__InvalidPercentageToLock();
+=======
             revert PolyBetFactory__InvalidInitialLiquidity();
         }
         if (_initialYesProbability >= 100 || _initialYesProbability == 0) {
@@ -75,6 +112,7 @@ contract PolyBetFactory {
         }
         if (_percentageToLock >= 100 || _percentageToLock == 0) {
             revert PolyBetFactory__InvalidPercentageToLock();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
         }
         _;
     }
@@ -83,10 +121,17 @@ contract PolyBetFactory {
     ////Constructor///
     //////////////////
 
+<<<<<<< HEAD
+    constructor(address _oracle, address _registry, address _predikt) {
+        i_oracle = _oracle;
+        i_registry = _registry;
+        i_predikt = _predikt;
+=======
     constructor(address _oracle, address _registry, address _polyBet) {
         i_oracle = _oracle;
         i_registry = _registry;
         i_polyBet = _polyBet;
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
 
         // Initialize default categories
         s_categories.push("crypto");
@@ -127,11 +172,19 @@ contract PolyBetFactory {
     {
         // Validate expiration time
         if (_expirationTime <= block.timestamp + 1 hours) {
+<<<<<<< HEAD
+            revert PrediktFactory__InvalidExpirationTime();
+        }
+
+        // Create market in the main Predikt contract
+        marketAddress = Predikt(i_predikt).createMarket{ value: msg.value }(
+=======
             revert PolyBetFactory__InvalidExpirationTime();
         }
 
         // Create market in the main PolyBet contract
         marketAddress = PolyBet(i_polyBet).createMarket{ value: msg.value }(
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
             _question,
             _category,
             _initialTokenValue,
@@ -143,7 +196,11 @@ contract PolyBetFactory {
         s_marketCount++;
 
         // Register market in registry
+<<<<<<< HEAD
+        PrediktRegistry(i_registry).registerMarket(marketAddress, msg.sender, _question, _category, block.timestamp);
+=======
         PolyBetRegistry(i_registry).registerMarket(marketAddress, msg.sender, _question, _category, block.timestamp);
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
 
         emit MarketCreated(marketAddress, msg.sender, _question, _category, msg.value, block.timestamp);
 
@@ -158,7 +215,11 @@ contract PolyBetFactory {
         // Check if category already exists
         for (uint256 i = 0; i < s_categories.length; i++) {
             if (keccak256(bytes(s_categories[i])) == keccak256(bytes(_category))) {
+<<<<<<< HEAD
+                revert PrediktFactory__InvalidCategory();
+=======
                 revert PolyBetFactory__InvalidCategory();
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
             }
         }
 
@@ -197,8 +258,14 @@ contract PolyBetFactory {
     function getFactoryInfo()
         external
         view
+<<<<<<< HEAD
+        returns (address oracle, address registry, address predikt, uint256 marketCount, string[] memory categories)
+    {
+        return (i_oracle, i_registry, i_predikt, s_marketCount, s_categories);
+=======
         returns (address oracle, address registry, address polyBet, uint256 marketCount, string[] memory categories)
     {
         return (i_oracle, i_registry, i_polyBet, s_marketCount, s_categories);
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
     }
 }

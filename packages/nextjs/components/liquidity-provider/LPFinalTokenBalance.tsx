@@ -47,11 +47,11 @@ export function LPFinalTokenBalance({
       <p className="mt-0 mb-0">
         Redeemable &quot;{winningOption}&quot; Token Balance: <br />
         <span className="text-gray-700">{balance ? formatEther(balance) : "0"} tokens</span> worth{" "}
-        {tokenValue && balance ? formatEther((tokenValue * balance) / BigInt(10 ** 18)) : "0"} ETH
+        {tokenValue && balance ? formatEther((tokenValue * balance) / BigInt(10 ** 18)) : "0"} STT
       </p>
       <p className="mt-4 mb-0">
         LP Revenue:{" "}
-        <span className="text-gray-700">{lpRevenue ? Number(formatEther(lpRevenue)).toFixed(4) : "0"} ETH</span>
+        <span className="text-gray-700">{lpRevenue ? Number(formatEther(lpRevenue)).toFixed(4) : "0"} STT</span>
         <br />
         <strong>Withdraw in total: </strong>
         {balance && tokenValue && lpRevenue

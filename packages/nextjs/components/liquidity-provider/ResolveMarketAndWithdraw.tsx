@@ -20,7 +20,7 @@ export function ResolveMarketAndWithdraw() {
           </div>
         ) : (
           <div>
-            <h2 className="card-title text-center mb-5 text-2xl">Resolve Market and Withdraw ETH</h2>
+            <h2 className="card-title text-center mb-5 text-2xl">Resolve Market and Withdraw STT</h2>
             <div className="flex flex-row gap-4 items-center justify-between">
               <div className="flex gap-4">
                 <button className="btn btn-primary text-lg" onClick={handleWithdraw}>
