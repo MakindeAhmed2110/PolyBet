@@ -6,7 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { hardhat } from "viem/chains";
 import { Bars3Icon } from "@heroicons/react/24/outline";
-import { BanknotesIcon, UserIcon } from "@heroicons/react/24/outline";
+import { BanknotesIcon, ChartBarIcon, PlusIcon, UserIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
 
@@ -18,14 +18,29 @@ type HeaderMenuLink = {
 
 export const menuLinks: HeaderMenuLink[] = [
   {
-    label: "User",
+    label: "Markets",
+    href: "/markets",
+    icon: <ChartBarIcon className="h-4 w-4" />,
+  },
+  {
+    label: "My Bets",
     href: "/user",
     icon: <UserIcon className="h-4 w-4" />,
+  },
+  {
+    label: "Create Market",
+    href: "/create-market",
+    icon: <PlusIcon className="h-4 w-4" />,
   },
   {
     label: "Liquidity Provider",
     href: "/liquidity-provider",
     icon: <BanknotesIcon className="h-4 w-4" />,
+  },
+  {
+    label: "Oracle",
+    href: "/oracle",
+    icon: <ChartBarIcon className="h-4 w-4" />,
   },
 ];
 

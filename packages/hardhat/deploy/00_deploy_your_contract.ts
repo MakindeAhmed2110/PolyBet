@@ -2,14 +2,13 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { DeployFunction } from "hardhat-deploy/types";
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
-import * as fs from "fs";
+
 /**
- * Deploys a contract named "YourContract" using the deployer account and
- * constructor arguments set to the deployer address
+ * Deploys the PolyBet platform contracts using the deployer account
  *
  * @param hre HardhatRuntimeEnvironment object.
  */
-const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+const deployPolyBet: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   /*
     On localhost, the deployer account is the one that comes with Hardhat, which is already funded.
 
@@ -23,55 +22,66 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
 
-  const question = "Will the green car win the race?";
-  const initialLiquidity = ethers.parseEther("0.05");
-  const initialTokenValue = ethers.parseEther("0.01");
-  const initialProbability = 50;
-  const percentageLocked = 10;
-  const liquidityProvider = deployer;
-  const oracle = deployer;
+  // Fixed oracle address for all markets
+  const oracleAddress = "0x76005d75bFd086Cd986f93Ca871b826daE277025";
 
-  await deploy("PredictionMarket", {
+  console.log("🚀 Deploying PolyBet Platform...");
+  console.log("📋 Deployer:", deployer);
+  console.log("🔮 Oracle:", oracleAddress);
+
+  // 1. Deploy PolyBetRegistry first (with zero address initially)
+  console.log("\n📄 Deploying PolyBetRegistry...");
+  await deploy("PolyBetRegistry", {
     from: deployer,
-    // Contract constructor arguments
-    args: [liquidityProvider, oracle, question, initialTokenValue, initialProbability, percentageLocked],
+    args: [ethers.ZeroAddress], // Factory address will be set later
     log: true,
-    value: initialLiquidity.toString(),
-    // autoMine: can be passed to the deploy function to make the deployment process faster on local networks by
-    // automatically mining the contract deployment transaction. There is no effect on live networks.
     autoMine: true,
   });
 
-  // Get the deployed contract to interact with it after deploying.
-  const predictionMarket = await hre.ethers.getContract<Contract>("PredictionMarket", deployer);
-  console.log("PredictionMarket deployed to:", await predictionMarket.getAddress());
+  const registry = await hre.ethers.getContract<Contract>("PolyBetRegistry", deployer);
+  const registryAddress = await registry.getAddress();
+  console.log("✅ PolyBetRegistry deployed to:", registryAddress);
 
-  // Get the deployed contract's address and ABI for the YES and NO tokens and copy them to the deployments directory
-  if (predictionMarket.i_yesToken && predictionMarket.i_noToken) {
-    try {
-      const { abi } = JSON.parse(
-        fs.readFileSync("./artifacts/contracts/PredictionMarketToken.sol/PredictionMarketToken.json").toString(),
-      );
+  // 2. Deploy PolyBet main contract with registry address
+  console.log("\n🎯 Deploying PolyBet...");
+  await deploy("PolyBet", {
+    from: deployer,
+    args: [oracleAddress, registryAddress],
+    log: true,
+    autoMine: true,
+  });
 
-      const i_yesToken = await predictionMarket.i_yesToken();
-      const i_noToken = await predictionMarket.i_noToken();
-      const yesToken = { address: i_yesToken, abi };
-      const noToken = { address: i_noToken, abi };
+  const polyBet = await hre.ethers.getContract<Contract>("PolyBet", deployer);
+  const polyBetAddress = await polyBet.getAddress();
+  console.log("✅ PolyBet deployed to:", polyBetAddress);
 
-      const chainDir = `./deployments/${hre.network.name}`;
-      fs.writeFileSync(`${chainDir}/PredictionMarketTokenYes.json`, JSON.stringify(yesToken, null, 2));
-      fs.writeFileSync(`${chainDir}/PredictionMarketTokenNo.json`, JSON.stringify(noToken, null, 2));
-      console.log("Token JSON files written successfully");
-    } catch (error) {
-      console.error("Error handling token files:", error);
-    }
-  } else {
-    console.log("No Yes, No token contracts deployed yet");
-  }
+  // 3. Deploy PolyBetFactory with all addresses
+  console.log("\n🏭 Deploying PolyBetFactory...");
+  await deploy("PolyBetFactory", {
+    from: deployer,
+    args: [oracleAddress, registryAddress, polyBetAddress],
+    log: true,
+    autoMine: true,
+  });
+
+  const factory = await hre.ethers.getContract<Contract>("PolyBetFactory", deployer);
+  const factoryAddress = await factory.getAddress();
+  console.log("✅ PolyBetFactory deployed to:", factoryAddress);
+
+  // 4. Link Factory to Registry
+  console.log("\n🔗 Linking Factory to Registry...");
+  const setFactoryTx = await registry.setFactory(factoryAddress);
+  await setFactoryTx.wait();
+  console.log("✅ Factory linked to Registry");
+
+  console.log("\n🎉 PolyBet Platform deployment complete!");
+  console.log("🎯 PolyBet:", polyBetAddress);
+  console.log("📊 Factory:", factoryAddress);
+  console.log("📋 Registry:", registryAddress);
 };
 
-export default deployYourContract;
+export default deployPolyBet;
 
 // Tags are useful if you have multiple deploy files and only want to run one of them.
-// e.g. yarn deploy --tags YourContract
-deployYourContract.tags = ["PredictionMarket"];
+// e.g. yarn deploy --tags PolyBet
+deployPolyBet.tags = ["PolyBet"];

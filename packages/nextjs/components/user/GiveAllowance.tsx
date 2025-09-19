@@ -42,6 +42,7 @@ export function GiveAllowance({
         address: tokenAddress,
         functionName: "approve",
         args: [spenderAddress, parseEther(showInput ? inputAmount || "0" : amount)],
+        gas: BigInt(5000000), // Set gas limit for Somnia
       });
       notification.success("Tokens approved successfully");
     } catch (error) {

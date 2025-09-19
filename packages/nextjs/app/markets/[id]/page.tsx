@@ -547,7 +547,11 @@ const MarketDetail: NextPage = () => {
                 <div className="grid grid-cols-2 gap-4 pt-4 border-t border-gray-200">
                   <div>
                     <p className="text-sm text-gray-500">Volume</p>
+<<<<<<< HEAD
                     <p className="text-lg font-semibold text-gray-900">{volume.toFixed(4)} STT</p>
+=======
+                    <p className="text-lg font-semibold text-gray-900">{volume.toFixed(4)} ETH</p>
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                   </div>
                   <div>
                     <p className="text-sm text-gray-500">Status</p>
@@ -618,7 +622,11 @@ const MarketDetail: NextPage = () => {
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">Initial Token Value:</span>
                       <span className="font-semibold text-gray-900">
+<<<<<<< HEAD
                         {marketData ? formatEther(marketData[3] as bigint) : "0"} STT
+=======
+                        {marketData ? formatEther(marketData[3] as bigint) : "0"} ETH
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -630,15 +638,25 @@ const MarketDetail: NextPage = () => {
                       <span className="font-semibold text-gray-900">{marketData ? Number(marketData[12]) : 0}%</span>
                     </div>
                     <div className="flex justify-between text-sm">
+<<<<<<< HEAD
                       <span className="text-gray-600">STT Collateral:</span>
                       <span className="font-semibold text-gray-900">
                         {marketData ? formatEther(marketData[8] as bigint) : "0"} STT
+=======
+                      <span className="text-gray-600">ETH Collateral:</span>
+                      <span className="font-semibold text-gray-900">
+                        {marketData ? formatEther(marketData[8] as bigint) : "0"} ETH
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600">LP Trading Revenue:</span>
                       <span className="font-semibold text-gray-900">
+<<<<<<< HEAD
                         {marketData ? formatEther(marketData[9] as bigint) : "0"} STT
+=======
+                        {marketData ? formatEther(marketData[9] as bigint) : "0"} ETH
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                       </span>
                     </div>
                     <div className="flex justify-between text-sm">
@@ -812,7 +830,11 @@ const MarketDetail: NextPage = () => {
                     {/* Info */}
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
+<<<<<<< HEAD
                         💡 If you&apos;re right, you&apos;ll receive STT when the market resolves.
+=======
+                        💡 If you&apos;re right, you&apos;ll receive ETH when the market resolves.
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                       </p>
                     </div>
                   </>
@@ -841,12 +863,21 @@ const MarketDetail: NextPage = () => {
                         <span className="font-medium text-green-600">{winningOutcome === 0 ? "YES" : "NO"}</span>
                       </div>
                       <div className="flex justify-between">
+<<<<<<< HEAD
                         <span className="text-gray-600">STT Collateral:</span>
                         <span className="font-medium">{formatEther(ethCollateral || 0n)} STT</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-gray-600">Trading Revenue:</span>
                         <span className="font-medium">{formatEther(lpTradingRevenue || 0n)} STT</span>
+=======
+                        <span className="text-gray-600">ETH Collateral:</span>
+                        <span className="font-medium">{formatEther(ethCollateral || 0n)} ETH</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600">Trading Revenue:</span>
+                        <span className="font-medium">{formatEther(lpTradingRevenue || 0n)} ETH</span>
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                       </div>
                     </div>
                   </div>
@@ -927,7 +958,11 @@ const MarketDetail: NextPage = () => {
                               (parseFloat(formatEther(ethCollateral || 0n)) +
                                 parseFloat(formatEther(lpTradingRevenue || 0n)))
                             ).toFixed(4)}{" "}
+<<<<<<< HEAD
                             STT
+=======
+                            ETH
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                           </p>
                         </div>
 
@@ -950,7 +985,11 @@ const MarketDetail: NextPage = () => {
 
                   <div className="mt-4 p-3 bg-green-50 rounded-lg">
                     <p className="text-sm text-green-800">
+<<<<<<< HEAD
                       💰 Redeem your winning tokens to receive STT based on the market outcome.
+=======
+                      💰 Redeem your winning tokens to receive ETH based on the market outcome.
+>>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                     </p>
                   </div>
                 </div>

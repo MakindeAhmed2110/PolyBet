@@ -1,179 +1,223 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import type { NextPage } from "next";
+import { useAccount } from "wagmi";
+import { useMarkets } from "~~/hooks/useMarkets";
 
-// Mock data for available bets - in a real app, this would come from your smart contract or API
-const availableBets = [
-  {
-    id: "1",
-    title: "Will Bitcoin reach $100,000 by end of 2024?",
-    category: "Crypto",
-    volume: "2.4M $SOMI",
-    yesProbability: 65,
-    noProbability: 35,
-    endDate: "Dec 31, 2024",
-    image: "/crypto-icon.png",
-  },
-  {
-    id: "2",
-    title: "Will the US Federal Reserve cut rates in Q1 2025?",
-    category: "Economics",
-    volume: "1.8M $SOMI",
-    yesProbability: 72,
-    noProbability: 28,
-    endDate: "Mar 31, 2025",
-    image: "/fed-icon.png",
-  },
-  {
-    id: "3",
-    title: "Will Tesla stock reach $300 by June 2025?",
-    category: "Stocks",
-    volume: "3.2M $SOMI",
-    yesProbability: 45,
-    noProbability: 55,
-    endDate: "Jun 30, 2025",
-    image: "/tesla-icon.png",
-  },
-  {
-    id: "4",
-    title: "Will there be a major AI breakthrough announced in 2025?",
-    category: "Tech",
-    volume: "1.5M $SOMI",
-    yesProbability: 80,
-    noProbability: 20,
-    endDate: "Dec 31, 2025",
-    image: "/ai-icon.png",
-  },
-  {
-    id: "5",
-    title: "Will the 2024 US Presidential Election be decided by less than 5% margin?",
-    category: "Politics",
-    volume: "5.1M $SOMI",
-    yesProbability: 58,
-    noProbability: 42,
-    endDate: "Nov 5, 2024",
-    image: "/election-icon.png",
-  },
-  {
-    id: "6",
-    title: "Will Ethereum 2.0 staking rewards exceed 5% annually?",
-    category: "Crypto",
-    volume: "1.2M $SOMI",
-    yesProbability: 38,
-    noProbability: 62,
-    endDate: "Dec 31, 2024",
-    image: "/eth-icon.png",
-  },
-];
+const User: NextPage = () => {
+  const { address } = useAccount();
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
-const Market: NextPage = () => {
+  // Fetch markets that the user has bet on
+  // For now, we'll show all markets - in a real app, you'd filter by user's bets
+  const {
+    data: marketsData,
+    isLoading: marketsLoading,
+    error: marketsError,
+  } = useMarkets({
+    search: searchQuery || undefined,
+    sortBy: "createdAt",
+    sortOrder: "desc",
+  });
+
+  const markets = marketsData?.markets || [];
+
   return (
     <>
       <div className="min-h-screen bg-gray-50">
-        {/* Navigation Categories */}
+        {/* Header */}
         <div className="bg-white border-b border-gray-200">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center space-x-8 py-4 overflow-x-auto">
-              <span className="text-black font-semibold whitespace-nowrap">Trending</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">New</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">All</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">Politics</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">Sports</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">Crypto</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">Economics</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">Tech</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">Culture</span>
-              <span className="text-gray-500 hover:text-gray-900 cursor-pointer whitespace-nowrap">World</span>
+            <div className="flex items-center justify-between h-16">
+              <div className="flex items-center space-x-4">
+                <h1 className="text-2xl font-bold text-gray-900" style={{ fontFamily: "PolySans Median, sans-serif" }}>
+                  My Bets
+                </h1>
+              </div>
+              <div className="flex items-center space-x-4">
+                <Link href="/markets" className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium">
+                  Browse Markets
+                </Link>
+                <Link
+                  href="/create-market"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                >
+                  Create Market
+                </Link>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Main Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Search and Filters */}
-          <div className="mb-8">
-            <div className="flex items-center space-x-4">
-              <div className="flex-1 relative">
-                <input
-                  type="text"
-                  placeholder="Search markets..."
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                />
-              </div>
-              <button className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          {/* Wallet Connection Check */}
+          {!address ? (
+            <div className="text-center py-12">
+              <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"
+                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
                   />
                 </svg>
-              </button>
+              </div>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Connect Your Wallet</h2>
+              <p className="text-gray-600 mb-6">
+                Connect your wallet to view your betting history and manage your positions.
+              </p>
+              <Link
+                href="/markets"
+                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+              >
+                Browse Markets
+              </Link>
             </div>
-          </div>
-
-          {/* Bet Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {availableBets.map(bet => (
-              <Link key={bet.id} href={`/user/bet/${bet.id}`}>
-                <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
-                  {/* Category Badge */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-                      {bet.category}
-                    </span>
-                    <span className="text-gray-500 text-sm">{bet.endDate}</span>
+          ) : (
+            <>
+              {/* Search */}
+              <div className="mb-8">
+                <div className="flex items-center space-x-4">
+                  <div className="flex-1 relative">
+                    <input
+                      type="text"
+                      placeholder="Search your bets..."
+                      value={searchQuery}
+                      onChange={e => setSearchQuery(e.target.value)}
+                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
                   </div>
-
-                  {/* Bet Title */}
-                  <h3
-                    className="text-lg font-semibold text-gray-900 mb-4 line-clamp-2"
-                    style={{ fontFamily: "PolySans Neutral, sans-serif" }}
-                  >
-                    {bet.title}
-                  </h3>
-
-                  {/* Probability Bars */}
-                  <div className="space-y-3 mb-4">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">Yes</span>
-                      <span className="text-sm font-bold text-green-600">{bet.yesProbability}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-green-500 h-2 rounded-full" style={{ width: `${bet.yesProbability}%` }}></div>
-                    </div>
-
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-gray-700">No</span>
-                      <span className="text-sm font-bold text-red-600">{bet.noProbability}%</span>
-                    </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div className="bg-red-500 h-2 rounded-full" style={{ width: `${bet.noProbability}%` }}></div>
-                    </div>
-                  </div>
-
-                  {/* Volume and Actions */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-500">{bet.volume} Vol.</span>
-                    <div className="flex space-x-2">
-                      <button className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded hover:bg-green-200">
-                        Yes
-                      </button>
-                      <button className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded hover:bg-red-200">
-                        No
-                      </button>
-                    </div>
+                  <div className="text-sm text-gray-500">
+                    {marketsLoading ? "Loading..." : `${markets.length} bets`}
                   </div>
                 </div>
-              </Link>
-            ))}
-          </div>
+              </div>
+
+              {/* Error State */}
+              {marketsError && (
+                <div className="text-center py-8">
+                  <p className="text-red-600">Error loading your bets: {marketsError.message}</p>
+                </div>
+              )}
+
+              {/* Loading State */}
+              {marketsLoading && (
+                <div className="text-center py-8">
+                  <p className="text-gray-500">Loading your bets...</p>
+                </div>
+              )}
+
+              {/* Empty State */}
+              {!marketsLoading && !marketsError && markets.length === 0 && (
+                <div className="text-center py-12">
+                  <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                      />
+                    </svg>
+                  </div>
+                  <h2 className="text-xl font-semibold text-gray-900 mb-2">No Bets Yet</h2>
+                  <p className="text-gray-600 mb-6">
+                    You haven&apos;t placed any bets yet. Start trading on prediction markets!
+                  </p>
+                  <Link
+                    href="/markets"
+                    className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium"
+                  >
+                    Browse Markets
+                  </Link>
+                </div>
+              )}
+
+              {/* Bets Grid */}
+              {!marketsLoading && !marketsError && markets.length > 0 && (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                  {markets.map(market => {
+                    const yesProbability = market.initialYesProbability;
+                    const noProbability = 100 - yesProbability;
+                    const expirationDate = new Date(market.expirationTime).toLocaleDateString();
+
+                    return (
+                      <Link key={market.id} href={`/markets/${market.address}`}>
+                        <div className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow cursor-pointer">
+                          {/* Category Badge */}
+                          <div className="flex items-center justify-between mb-4">
+                            <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
+                              {market.category.icon} {market.category.name}
+                            </span>
+                            <span className="text-gray-500 text-sm">{expirationDate}</span>
+                          </div>
+
+                          {/* Market Question */}
+                          <h3
+                            className="text-lg font-semibold text-gray-900 mb-4 line-clamp-2"
+                            style={{ fontFamily: "PolySans Neutral, sans-serif" }}
+                          >
+                            {market.question}
+                          </h3>
+
+                          {/* Market Description */}
+                          {market.description && (
+                            <p className="text-sm text-gray-600 mb-4 line-clamp-2">{market.description}</p>
+                          )}
+
+                          {/* Probability Bars */}
+                          <div className="space-y-3 mb-4">
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-700">Yes</span>
+                              <span className="text-sm font-bold text-green-600">{yesProbability}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div
+                                className="bg-green-500 h-2 rounded-full"
+                                style={{ width: `${yesProbability}%` }}
+                              ></div>
+                            </div>
+
+                            <div className="flex items-center justify-between">
+                              <span className="text-sm font-medium text-gray-700">No</span>
+                              <span className="text-sm font-bold text-red-600">{noProbability}%</span>
+                            </div>
+                            <div className="w-full bg-gray-200 rounded-full h-2">
+                              <div className="bg-red-500 h-2 rounded-full" style={{ width: `${noProbability}%` }}></div>
+                            </div>
+                          </div>
+
+                          {/* Volume and Status */}
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm text-gray-500">
+                              <div>Vol: {parseFloat(market.totalVolume).toFixed(2)} ETH</div>
+                              <div className="text-xs capitalize">{market.status.toLowerCase()}</div>
+                            </div>
+                            <div className="flex space-x-2">
+                              <button className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded hover:bg-green-200">
+                                Yes
+                              </button>
+                              <button className="px-3 py-1 bg-red-100 text-red-700 text-sm font-medium rounded hover:bg-red-200">
+                                No
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </Link>
+                    );
+                  })}
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </>
   );
 };
 
-export default Market;
+export default User;
