@@ -177,11 +177,7 @@ const LiquidityProvider: NextPage = () => {
       }, 2000);
     } catch (error) {
       console.error("Error adding liquidity:", error);
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+
       alert("Failed to add liquidity. Please try again.");
     } finally {
       setIsLoading(false);
@@ -201,11 +197,9 @@ const LiquidityProvider: NextPage = () => {
     // Check if user has enough liquidity
     const userContribution = userLiquidityContributions[selectedBet] || 0;
     if (amount > userContribution) {
-<<<<<<< HEAD
+
       alert(`You can only remove up to ${userContribution} STT`);
-=======
-      alert(`You can only remove up to ${userContribution} ETH`);
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+
       return;
     }
 
@@ -267,10 +261,6 @@ const LiquidityProvider: NextPage = () => {
     } catch (error) {
       console.error("Error claiming LP revenue:", error);
       alert("Failed to claim LP revenue. Please try again.");
-<<<<<<< HEAD
->>>>>>> 2e9faa2 (last)
-=======
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
     } finally {
       setIsLoading(false);
     }
@@ -341,15 +331,6 @@ const LiquidityProvider: NextPage = () => {
                   </div>
                 )}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          <div className="grid grid-cols-2 gap-4 text-sm">
-                            <div>
-                              <p className="text-gray-500">Volume</p>
-                              <p className="font-semibold text-gray-900">{bet.volume}</p>
-=======
-=======
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                 {/* Markets List */}
                 {!marketsLoading && !marketsError && markets.length > 0 && (
                   <div className="space-y-4">
@@ -391,20 +372,16 @@ const LiquidityProvider: NextPage = () => {
                                 )}
                                 {hasUserContribution && (
                                   <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-<<<<<<< HEAD
+
                                     Your Liquidity: {userContribution.toFixed(4)} STT
-=======
-                                    Your Liquidity: {userContribution.toFixed(4)} ETH
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+
+
+
                                   </span>
                                 )}
                                 {hasAccumulatedRevenue && (
                                   <span className="px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">
-<<<<<<< HEAD
                                     Revenue: {accumulatedRevenue.toFixed(4)} STT
-=======
-                                    Revenue: {accumulatedRevenue.toFixed(4)} ETH
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                                   </span>
                                 )}
                               </div>
@@ -423,19 +400,11 @@ const LiquidityProvider: NextPage = () => {
                               <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
                                   <p className="text-gray-500">Volume</p>
-<<<<<<< HEAD
                                   <p className="font-semibold text-gray-900">{totalVolume} STT</p>
                                 </div>
                                 <div>
                                   <p className="text-gray-500">Current Liquidity</p>
                                   <p className="font-semibold text-gray-900">{currentLiquidity} STT</p>
-=======
-                                  <p className="font-semibold text-gray-900">{totalVolume} ETH</p>
-                                </div>
-                                <div>
-                                  <p className="text-gray-500">Current Liquidity</p>
-                                  <p className="font-semibold text-gray-900">{currentLiquidity} ETH</p>
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                                 </div>
                                 <div>
                                   <p className="text-gray-500">Yes Probability</p>
@@ -448,10 +417,7 @@ const LiquidityProvider: NextPage = () => {
                                   </p>
                                 </div>
                               </div>
-<<<<<<< HEAD
->>>>>>> 2e9faa2 (last)
-=======
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+
                             </div>
 
                             <div className="ml-4 flex flex-col items-end space-y-2">
@@ -518,11 +484,7 @@ const LiquidityProvider: NextPage = () => {
                       <p className="text-sm text-gray-600">
                         {markets.find(market => market.address === selectedBet)?.question}
                       </p>
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+
                       <div className="mt-2 flex flex-wrap gap-2">
                         {markets.find(market => market.address === selectedBet)?.creatorAddress?.toLowerCase() ===
                           address?.toLowerCase() && (
@@ -532,31 +494,18 @@ const LiquidityProvider: NextPage = () => {
                         )}
                         {userLiquidityContributions[selectedBet] > 0 && (
                           <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded">
-<<<<<<< HEAD
                             Your Liquidity: {userLiquidityContributions[selectedBet].toFixed(4)} STT
                           </span>
                         )}
                       </div>
->>>>>>> 2e9faa2 (last)
-=======
-                            Your Liquidity: {userLiquidityContributions[selectedBet].toFixed(4)} ETH
-                          </span>
-                        )}
-                      </div>
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+
                     </div>
 
                     {/* Amount Input */}
                     <div className="mb-6">
-<<<<<<< HEAD
-<<<<<<< HEAD
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Liquidity Amount ($SOMI)</label>
-=======
+
                       <label className="block text-sm font-medium text-gray-700 mb-2">Liquidity Amount (STT)</label>
->>>>>>> 2e9faa2 (last)
-=======
-                      <label className="block text-sm font-medium text-gray-700 mb-2">Liquidity Amount (ETH)</label>
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+
                       <div className="relative">
                         <input
                           type="number"
@@ -566,15 +515,7 @@ const LiquidityProvider: NextPage = () => {
                           className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                         />
                         <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          <Image src="/somnia.png" alt="$SOMI" width={20} height={20} className="w-5 h-5" />
-=======
                           <span className="text-gray-500 text-sm">STT</span>
->>>>>>> 2e9faa2 (last)
-=======
-                          <span className="text-gray-500 text-sm">ETH</span>
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                         </div>
                       </div>
                     </div>
@@ -585,15 +526,9 @@ const LiquidityProvider: NextPage = () => {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between">
                           <span className="text-gray-600">Your Contribution:</span>
-<<<<<<< HEAD
-<<<<<<< HEAD
-                          <span className="font-medium">{liquidityAmount || "0"} $SOMI</span>
-=======
+
+
                           <span className="font-medium">{liquidityAmount || "0"} STT</span>
->>>>>>> 2e9faa2 (last)
-=======
-                          <span className="font-medium">{liquidityAmount || "0"} ETH</span>
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                         </div>
                         <div className="flex justify-between">
                           <span className="text-gray-600">Trading Fee:</span>
@@ -619,13 +554,9 @@ const LiquidityProvider: NextPage = () => {
                       {isLoading ? "Adding Liquidity..." : "Add Liquidity"}
                     </button>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-=======
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+
                     {/* Remove Liquidity Section */}
-                    {userLiquidityContributions[selectedBet] > 0 && (
+                    {selectedBet && userLiquidityContributions[selectedBet] > 0 && (
                       <>
                         <div className="mt-8 pt-6 border-t border-gray-200">
                           <h3 className="text-lg font-semibold text-gray-900 mb-4">Remove Liquidity</h3>
@@ -633,11 +564,7 @@ const LiquidityProvider: NextPage = () => {
                           {/* Remove Amount Input */}
                           <div className="mb-4">
                             <label className="block text-sm font-medium text-gray-700 mb-2">
-<<<<<<< HEAD
                               Amount to Remove (STT)
-=======
-                              Amount to Remove (ETH)
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                             </label>
                             <div className="relative">
                               <input
@@ -645,23 +572,15 @@ const LiquidityProvider: NextPage = () => {
                                 value={removeAmount}
                                 onChange={e => setRemoveAmount(e.target.value)}
                                 placeholder="0.0"
-                                max={userLiquidityContributions[selectedBet]}
+                                max={selectedBet ? userLiquidityContributions[selectedBet] : 0}
                                 className="w-full px-4 py-3 pr-12 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
                               />
                               <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-<<<<<<< HEAD
                                 <span className="text-gray-500 text-sm">STT</span>
                               </div>
                             </div>
                             <p className="text-xs text-gray-500 mt-1">
-                              Max: {userLiquidityContributions[selectedBet].toFixed(4)} STT
-=======
-                                <span className="text-gray-500 text-sm">ETH</span>
-                              </div>
-                            </div>
-                            <p className="text-xs text-gray-500 mt-1">
-                              Max: {userLiquidityContributions[selectedBet].toFixed(4)} ETH
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
+                              Max: {userLiquidityContributions[selectedBet]?.toFixed(4) || "0"} STT
                             </p>
                           </div>
 
@@ -681,10 +600,6 @@ const LiquidityProvider: NextPage = () => {
                       </>
                     )}
 
-<<<<<<< HEAD
->>>>>>> 2e9faa2 (last)
-=======
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                     {/* Info */}
                     <div className="mt-4 p-3 bg-blue-50 rounded-lg">
                       <p className="text-sm text-blue-800">
@@ -728,15 +643,7 @@ const LiquidityProvider: NextPage = () => {
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">Add Liquidity</h3>
                 <p className="text-gray-600 text-sm">
-<<<<<<< HEAD
-<<<<<<< HEAD
-                  Provide $SOMI tokens to create liquidity pools for both Yes and No outcomes
-=======
                   Provide STT to create liquidity pools for both Yes and No outcomes
->>>>>>> 2e9faa2 (last)
-=======
-                  Provide ETH to create liquidity pools for both Yes and No outcomes
->>>>>>> 9cc37c7d11685938744cb3173767a1ef4b707f27
                 </p>
               </div>
               <div className="text-center">
